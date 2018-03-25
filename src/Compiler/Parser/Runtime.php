@@ -10,11 +10,14 @@ declare(strict_types=1);
 namespace Railt\Compiler\Parser;
 
 use Railt\Compiler\Iterator\BufferedIterator;
+use Railt\Compiler\Lexer\TokenInterface;
 use Railt\Compiler\LexerInterface;
 use Railt\Compiler\Parser\Ast\Leaf;
 use Railt\Compiler\Parser\Ast\Node;
 use Railt\Compiler\Parser\Ast\NodeInterface;
 use Railt\Compiler\Parser\Ast\Rule as AstRule;
+use Railt\Compiler\Parser\Exceptions\ParserException;
+use Railt\Compiler\Parser\Exceptions\UnexpectedTokenException;
 use Railt\Compiler\Parser\Rule\Choice;
 use Railt\Compiler\Parser\Rule\Concatenation;
 use Railt\Compiler\Parser\Rule\Entry;
@@ -77,7 +80,9 @@ abstract class Runtime implements ParserInterface
      * Parse :-).
      *
      * @param Readable $input
-     * @return mixed
+     * @return NodeInterface
+     * @throws ParserException
+     * @throws UnexpectedTokenException
      */
     public function parse(Readable $input): NodeInterface
     {
@@ -101,17 +106,18 @@ abstract class Runtime implements ParserInterface
             }
 
             if ($this->backtrack($buffer) === false) {
-                $token = $buffer->last();
+                /** @var TokenInterface $token */
+                $token = $buffer->top();
 
                 $error = \sprintf('Unexpected token %s', $token);
-                throw new \RuntimeException($error);
+                throw UnexpectedTokenException::fromFile($error, $input, $token->offset());
             }
         } while (true);
 
         $ast = $this->buildTree();
 
         if (! ($ast instanceof NodeInterface)) {
-            throw new \RuntimeException('Parsing error: cannot build AST, the trace is corrupted.', 1);
+            throw new ParserException('Parsing error: cannot build AST, the trace is corrupted.', 1);
         }
 
         return $ast;
@@ -138,6 +144,7 @@ abstract class Runtime implements ParserInterface
      * Get root rule.
      *
      * @return string
+     * @throws ParserException
      */
     public function getRootRule(): string
     {
@@ -147,7 +154,7 @@ abstract class Runtime implements ParserInterface
             }
         }
 
-        throw new \RuntimeException('Invalid grammar root rule (Can not find)');
+        throw new ParserException('Can not find root rule');
     }
 
     /**
@@ -276,14 +283,6 @@ abstract class Runtime implements ParserInterface
     }
 
     /**
-     * @return array
-     */
-    public function getRules(): array
-    {
-        return $this->rules;
-    }
-
-    /**
      * Get rule by name.
      *
      * @param $name
@@ -366,7 +365,7 @@ abstract class Runtime implements ParserInterface
 
                 if ($id !== null) {
                     $children[] = [
-                        'id'      => $id,
+                        'id' => $id,
                     ];
                 }
 
@@ -416,5 +415,13 @@ abstract class Runtime implements ParserInterface
         }
 
         return $children[0];
+    }
+
+    /**
+     * @return array
+     */
+    public function getRules(): array
+    {
+        return $this->rules;
     }
 }

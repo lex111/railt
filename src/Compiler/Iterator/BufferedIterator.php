@@ -12,7 +12,7 @@ namespace Railt\Compiler\Iterator;
 /**
  * Class BufferedIterator
  */
-class BufferedIterator extends \IteratorIterator
+class BufferedIterator extends \IteratorIterator implements Buffer
 {
     /**
      * Buffer key index.
@@ -33,21 +33,21 @@ class BufferedIterator extends \IteratorIterator
      *
      * @var \Iterator
      */
-    protected $_iterator;
+    protected $iterator;
 
     /**
      * Buffer.
      *
      * @var \SplDoublyLinkedList
      */
-    protected $_buffer;
+    protected $buffer;
 
     /**
      * Maximum buffer size.
      *
      * @var int
      */
-    protected $_bufferSize = 1;
+    protected $bufferSize = 1;
 
     /**
      * Construct.
@@ -57,17 +57,25 @@ class BufferedIterator extends \IteratorIterator
      */
     public function __construct(\Traversable $iterator, $bufferSize)
     {
-        $this->_iterator   = $iterator;
-        $this->_bufferSize = \max($bufferSize, 1);
-        $this->_buffer     = new \SplDoublyLinkedList();
+        $this->iterator   = $iterator;
+        $this->bufferSize = \max($bufferSize, 1);
+        $this->buffer     = new \SplDoublyLinkedList();
     }
 
     /**
      * @return mixed
      */
-    public function last()
+    public function top()
     {
-        return $this->_buffer->top()[self::BUFFER_VALUE];
+        return $this->buffer->top()[self::BUFFER_VALUE];
+    }
+
+    /**
+     * @return mixed
+     */
+    public function bottom()
+    {
+        return $this->buffer->bottom()[self::BUFFER_VALUE];
     }
 
     /**
@@ -85,9 +93,9 @@ class BufferedIterator extends \IteratorIterator
      *
      * @return \SplDoublyLinkedList
      */
-    protected function getBuffer()
+    protected function getBuffer(): \SplDoublyLinkedList
     {
-        return $this->_buffer;
+        return $this->buffer;
     }
 
     /**
@@ -142,9 +150,9 @@ class BufferedIterator extends \IteratorIterator
      *
      * @return \Iterator
      */
-    public function getInnerIterator()
+    public function getInnerIterator(): \Iterator
     {
-        return $this->_iterator;
+        return $this->iterator;
     }
 
     /**
@@ -152,9 +160,9 @@ class BufferedIterator extends \IteratorIterator
      *
      * @return int
      */
-    public function getBufferSize()
+    public function getBufferSize(): int
     {
-        return $this->_bufferSize;
+        return $this->bufferSize;
     }
 
     /**
@@ -194,10 +202,9 @@ class BufferedIterator extends \IteratorIterator
      *
      * @return bool
      */
-    public function valid()
+    public function valid(): bool
     {
-        return
-            $this->getBuffer()->valid() &&
+        return $this->getBuffer()->valid() &&
             $this->getInnerIterator()->valid();
     }
 }
