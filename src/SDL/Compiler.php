@@ -11,7 +11,6 @@ namespace Railt\SDL;
 
 use Railt\Compiler\ParserInterface;
 use Railt\Io\Readable;
-use Railt\SDL\Compiler\SymbolTable;
 use Railt\SDL\Parser\Factory;
 
 /**
@@ -32,10 +31,8 @@ class Compiler
         $this->parser = new Factory();
     }
 
-    public function compile(Readable $input)
+    public function compile(Readable $input): void
     {
         $ast = $this->parser->parse($input);
-
-
     }
 }

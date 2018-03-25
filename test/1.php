@@ -7,8 +7,8 @@
  */
 declare(strict_types=1);
 
-use Railt\SDL\Compiler;
 use Railt\Io\File;
+use Railt\SDL\Compiler;
 
 require __DIR__ . '/../vendor/autoload.php';
 
