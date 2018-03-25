@@ -7,12 +7,13 @@
  */
 declare(strict_types=1);
 
-namespace Railt\SDL\Exceptions;
+namespace Railt\Reflection\Invocations;
+
+use Railt\Reflection\Invocations\Common\HasPassedArguments;
 
 /**
- * Class TypeConflictException
+ * Interface DirectiveInvocation
  */
-class TypeConflictException extends SchemaException
+interface DirectiveInvocation extends TypeInvocation, HasPassedArguments
 {
-
 }

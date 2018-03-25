@@ -40,6 +40,8 @@ trait CustomErrorPosition
     }
 
     /**
+     * Should return a source code column on which the error occurred.
+     *
      * @return int
      */
     public function getColumn(): int

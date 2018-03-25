@@ -7,12 +7,13 @@
  */
 declare(strict_types=1);
 
-namespace Railt\SDL\Exceptions;
+namespace Railt\Reflection\Definitions;
+
+use Railt\Reflection\Definitions\Input\HasInputFields;
 
 /**
- * Class TypeConflictException
+ * Interface InputDefinition
  */
-class TypeConflictException extends SchemaException
+interface InputDefinition extends TypeDefinition, HasInputFields
 {
-
 }

@@ -7,12 +7,12 @@
  */
 declare(strict_types=1);
 
-namespace Railt\SDL\Exceptions;
+use Railt\SDL\Compiler;
+use Railt\Io\File;
 
-/**
- * Class TypeConflictException
- */
-class TypeConflictException extends SchemaException
-{
+require __DIR__ . '/../vendor/autoload.php';
 
-}
+$gql = File::fromPathname(__DIR__ . '/complex.graphqls');
+
+$compiler = new Compiler();
+$compiler->compile($gql);

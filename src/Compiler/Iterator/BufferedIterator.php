@@ -63,6 +63,14 @@ class BufferedIterator extends \IteratorIterator
     }
 
     /**
+     * @return mixed
+     */
+    public function last()
+    {
+        return $this->_buffer->top()[self::BUFFER_VALUE];
+    }
+
+    /**
      * Return the current element.
      *
      * @return mixed

@@ -7,12 +7,11 @@
  */
 declare(strict_types=1);
 
-namespace Railt\SDL\Exceptions;
+namespace Railt\Reflection\Definitions;
 
 /**
- * Class TypeConflictException
+ * Interface ObjectDefinition
  */
-class TypeConflictException extends SchemaException
+interface ObjectDefinition extends InterfaceDefinition
 {
-
 }

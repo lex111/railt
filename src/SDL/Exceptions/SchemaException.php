@@ -8,26 +8,12 @@
 declare(strict_types=1);
 
 namespace Railt\SDL\Exceptions;
-
-use Railt\SDL\Runtime\CallStackInterface;
+use Railt\Compiler\Exceptions\CustomErrorPosition;
 
 /**
  * Interface SchemaException
  */
-interface SchemaException extends \Throwable
+class SchemaException extends \DomainException
 {
-    /**
-     * SchemaException constructor.
-     * @param string $message
-     * @param CallStackInterface $stack
-     * @param \Throwable|null $previous
-     */
-    public function __construct(string $message, CallStackInterface $stack, \Throwable $previous = null);
-
-    /**
-     * Should return a source code column on which the error occurred.
-     *
-     * @return int Returns the column offset where the error occurred.
-     */
-    public function getColumn(): int;
+    use CustomErrorPosition;
 }

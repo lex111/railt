@@ -101,7 +101,7 @@ abstract class Runtime implements ParserInterface
             }
 
             if ($this->backtrack($buffer) === false) {
-                $token = $buffer->current();
+                $token = $buffer->last();
 
                 $error = \sprintf('Unexpected token %s', $token);
                 throw new \RuntimeException($error);
