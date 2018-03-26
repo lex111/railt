@@ -16,6 +16,7 @@ class RegexNamedGroupsIterator extends RegexIterator
 {
     /**
      * @return \Traversable|array[]
+     * @throws \InvalidArgumentException
      * @throws \RuntimeException
      */
     public function getIterator(): \Traversable
