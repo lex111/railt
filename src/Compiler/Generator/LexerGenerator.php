@@ -9,7 +9,8 @@ declare(strict_types=1);
 
 namespace Railt\Compiler\Generator;
 
-use Railt\Compiler\Lexer;
+use Railt\Compiler\Lexer\Common\PCRECompiler;
+use Railt\Compiler\Lexer\Stateless;
 use Railt\Compiler\LexerInterface;
 
 /**
@@ -29,9 +30,9 @@ class LexerGenerator extends BaseCodeGenerator
 
     /**
      * LexerGenerator constructor.
-     * @param Lexer $lexer
+     * @param Stateless $lexer
      */
-    public function __construct(Lexer $lexer)
+    public function __construct(Stateless $lexer)
     {
         $this->lexer = $lexer;
     }
@@ -42,11 +43,12 @@ class LexerGenerator extends BaseCodeGenerator
      */
     protected function getContext(): \Generator
     {
+        $pcre = new PCRECompiler($this->lexer->getTokens());
+
         yield from parent::getContext();
 
-        $c = $this->lexer->getCompiler();
-
-        yield 'pattern' => $c->compile();
-        yield 'tokens' => $c->getTokens();
+        yield 'pattern' => $pcre->compile();
+        yield 'tokens' => $this->lexer->getTokens();
+        yield 'skip' => $this->lexer->getIgnoredTokens();
     }
 }

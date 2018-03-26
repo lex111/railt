@@ -42,9 +42,4 @@ interface Stateless extends Stateful
      * @return iterable
      */
     public function getIgnoredTokens(): iterable;
-
-    /**
-     * @return iterable
-     */
-    public function getContexts(): iterable;
 }

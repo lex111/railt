@@ -161,12 +161,4 @@ class Parle implements Stateless
     {
         return \array_values($this->skip);
     }
-
-    /**
-     * @return iterable
-     */
-    public function getContexts(): iterable
-    {
-        return [];
-    }
 }

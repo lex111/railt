@@ -82,12 +82,4 @@ class NativeStateless extends NativeStateful implements Stateless
     {
         return $this->skipped;
     }
-
-    /**
-     * @return iterable|int[]
-     */
-    public function getContexts(): iterable
-    {
-        return $this->contexts;
-    }
 }
