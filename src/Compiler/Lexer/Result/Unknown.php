@@ -10,26 +10,17 @@ declare(strict_types=1);
 namespace Railt\Compiler\Lexer\Result;
 
 /**
- * Class Undefined
+ * Class Unknown
  */
-final class Undefined extends Token
+final class Unknown extends Token
 {
-    public const NAME = 'T_UNDEFINED';
-
     /**
      * Undefined constructor.
      * @param string $value
+     * @param int $offset
      */
-    public function __construct(string $value)
+    public function __construct(string $value, int $offset = 0)
     {
-        parent::__construct(self::NAME, $value);
-    }
-
-    /**
-     * @return bool
-     */
-    public function isEof(): bool
-    {
-        return true;
+        parent::__construct(self::UNKNOWN_TOKEN, $value, $offset);
     }
 }

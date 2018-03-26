@@ -9,22 +9,20 @@ declare(strict_types=1);
 
 namespace Railt\Compiler\Lexer\Result;
 
-use Railt\Compiler\Lexer\TokenInterface;
+use Railt\Compiler\TokenInterface;
 
 /**
- * Class Eof
+ * Class Eoi
  */
-final class Eof implements TokenInterface
+final class Eoi extends BaseToken
 {
-    public const NAME = 'T_EOF';
-
     /**
      * @var int
      */
     private $offset;
 
     /**
-     * EndOfFile constructor.
+     * Eoi constructor.
      * @param int $offset
      */
     public function __construct(int $offset)
@@ -33,19 +31,19 @@ final class Eof implements TokenInterface
     }
 
     /**
-     * @return string
-     */
-    public function name(): string
-    {
-        return self::NAME;
-    }
-
-    /**
      * @return int
      */
     public function offset(): int
     {
         return $this->offset;
+    }
+
+    /**
+     * @return string
+     */
+    public function name(): string
+    {
+        return TokenInterface::END_OF_INPUT;
     }
 
     /**
@@ -71,38 +69,5 @@ final class Eof implements TokenInterface
     public function length(): int
     {
         return 0;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isSkipped(): bool
-    {
-        return true;
-    }
-
-    /**
-     * @return string
-     */
-    public function __toString(): string
-    {
-        return '"\0" (' . $this->name() . ')';
-    }
-
-    /**
-     * @param string[] ...$names
-     * @return bool
-     */
-    public function is(string ...$names): bool
-    {
-        return \in_array($this->name(), $names, true);
-    }
-
-    /**
-     * @return bool
-     */
-    public function isEof(): bool
-    {
-        return true;
     }
 }
