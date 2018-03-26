@@ -1,10 +1,15 @@
+
+//
+// Scalar definition
+//
+
 #ScalarDefinition:
-        Documentation()?
-    ::T_SCALAR:: TypeName()
-        __scalarExtends()?
-        Directive()*
+    Documentation()?
+    ScalarDefinitionBody()
+
+ScalarDefinitionBody:
+    ::T_SCALAR:: TypeName() __scalarExtends()? Directive()*
 
 __scalarExtends:
-    ::T_EXTENDS:: TypeName()
-        #Extends
+    ::T_EXTENDS:: TypeName() #Extends
 

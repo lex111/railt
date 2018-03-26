@@ -32,21 +32,21 @@ DocumentImports:
     Invocation()
 
 DocumentDefinitions:
-// Extension()     |
+    Extension() |
     Definition()
 
-// Extension:
-    // TODO ScalarExtension
-    // TODO ObjectExtension
-    // TODO InterfaceExtension
-    // TODO UnionExtension
-    // TODO EnumExtension
-    // TODO InputExtension
+
 
 /**
  * Common grammar rules
  */
 %include names
 %include values
+
+/**
+ * Type definitions and other
+ */
+%include module
 %include definitions
+%include extensions
 %include invocations

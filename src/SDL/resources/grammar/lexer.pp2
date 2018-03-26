@@ -28,12 +28,12 @@
 /**
  * Values
  */
-%token T_NUMBER                 \-?(0|[1-9][0-9]*)(\.[0-9]+)?([eE][\+\-]?[0-9]+)?\b -> val
-%token T_TRUE                   true\b  -> val
-%token T_FALSE                  false\b -> val
-%token T_NULL                   null\b  -> val
-%token T_BLOCK_STRING           """(?:\\"""|(?!""").|\s)+"""    -> val
-%token T_STRING                 "[^"\\]+(\\.[^"\\]*)*"  -> val
+%token T_NUMBER                 \-?(0|[1-9][0-9]*)(\.[0-9]+)?([eE][\+\-]?[0-9]+)?\b
+%token T_TRUE                   true\b
+%token T_FALSE                  false\b
+%token T_NULL                   null\b
+%token T_BLOCK_STRING           """(?:\\"""|(?!""").|\s)+""" -> $1
+%token T_STRING                 "[^"\\]+(\\.[^"\\]*)*" -> $1
 
 /**
  * Module system
@@ -68,8 +68,8 @@
 /**
  * Common
  */
-%token T_VARIABLE               (\$[_A-Za-z][_0-9A-Za-z]*)
-%token T_NAME                   ([_A-Za-z][_0-9A-Za-z]*)
+%token T_VARIABLE               \$[_A-Za-z][_0-9A-Za-z]*
+%token T_NAME                   [_A-Za-z][_0-9A-Za-z]*
 
 /**
  * --------------------------------------------------------------------------

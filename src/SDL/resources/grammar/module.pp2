@@ -1,6 +1,8 @@
+
 //
 // Namespace definition
 //
+
 #NamespaceDefinition:
     ::T_NAMESPACE:: TypeName()
 

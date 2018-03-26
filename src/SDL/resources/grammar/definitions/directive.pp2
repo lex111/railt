@@ -1,7 +1,15 @@
+
+//
+// Directive definition
+//
+
 #DirectiveDefinition:
     Documentation()?
+    DirectiveDefinitionBody()
+
+DirectiveDefinitionBody:
     ::T_DIRECTIVE:: ::T_DIRECTIVE_AT:: TypeName()
-    __directiveDefinitionArguments()?
+        __directiveDefinitionArguments()?
     ::T_ON:: __directiveDefinitionLocations()
 
 __directiveDefinitionArguments:

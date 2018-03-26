@@ -1,9 +1,13 @@
+
 //
-// Unions
+// Union definition
 //
 
 #UnionDefinition:
-        Documentation()?
+    Documentation()?
+    UnionDefinitionBody()
+
+UnionDefinitionBody:
     ::T_UNION:: TypeName()
         Directive()*
     ::T_EQUAL:: ::T_OR::? __unionDefinitionTargets()+
