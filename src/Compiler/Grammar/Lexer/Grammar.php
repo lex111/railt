@@ -47,7 +47,7 @@ final class Grammar extends GrammarRuntime
     /**
      * @var string The PCRE compiled pattern
      */
-    protected $pattern = '/(?P<T_WHITESPACE>\\s+)|(?P<T_COMMENT>\\/\\/[^\\n]*)|(?P<T_BLOCK_COMMENT>\\/\\*.*?\\*\\/)|(?P<T_PRAGMA>%pragma\\h+([\\w\\.]+)\\h+(.+?)\\s+)|(?P<T_TOKEN>%token\\h+(\\w+)\\h+(.+?)(?:\\h+\\->\\h+(\\w+))?\\s+)|(?P<T_SKIP>%skip\\h+(\\w+)\\h+(.+?)\\s+)|(?P<T_INCLUDE>%include\\h+(.+?)\\s+)|(?P<T_NODE_DEFINITION>(#?\\w+)\\s*:)|(?P<T_OR>\\|)|(?P<T_ZERO_OR_ONE>\\?)|(?P<T_ONE_OR_MORE>\\+)|(?P<T_ZERO_OR_MORE>\\*)|(?P<T_N_TO_M>{\\h*(\\d+),\\h*(\\d+)\\h*})|(?P<T_ZERO_TO_M>{\\h*,\\h*(\\d+)\\h*})|(?P<T_N_OR_MORE>{\\h*(\\d+)\\h*,\\h*})|(?P<T_EXACTLY_N>{(\\d+)})|(?P<T_SKIPPED>::(\\w+)::)|(?P<T_KEPT><(\\w+)>)|(?P<T_NAMED>(\\w+)\\(\\))|(?P<T_NODE>#(\\w+))|(?P<T_GROUP_OPEN>\\()|(?P<T_GROUP_CLOSE>\\))/mus';
+    protected $pattern = '/\G(?P<T_WHITESPACE>\\s+)|(?P<T_COMMENT>\\/\\/[^\\n]*)|(?P<T_BLOCK_COMMENT>\\/\\*.*?\\*\\/)|(?P<T_PRAGMA>%pragma\\h+([\\w\\.]+)\\h+(.+?)\\s+)|(?P<T_TOKEN>%token\\h+(\\w+)\\h+(.+?)(?:\\h+\\->\\h+(.*?))?\\s+)|(?P<T_SKIP>%skip\\h+(\\w+)\\h+(.+?)\\s+)|(?P<T_INCLUDE>%include\\h+(.+?)\\s+)|(?P<T_NODE_DEFINITION>(#?\\w+)\\s*:)|(?P<T_OR>\\|)|(?P<T_ZERO_OR_ONE>\\?)|(?P<T_ONE_OR_MORE>\\+)|(?P<T_ZERO_OR_MORE>\\*)|(?P<T_N_TO_M>{\\h*(\\d+),\\h*(\\d+)\\h*})|(?P<T_ZERO_TO_M>{\\h*,\\h*(\\d+)\\h*})|(?P<T_N_OR_MORE>{\\h*(\\d+)\\h*,\\h*})|(?P<T_EXACTLY_N>{(\\d+)})|(?P<T_SKIPPED>::(\\w+)::)|(?P<T_KEPT><(\\w+)>)|(?P<T_NAMED>(\\w+)\\(\\))|(?P<T_NODE>#(\\w+))|(?P<T_GROUP_OPEN>\\()|(?P<T_GROUP_CLOSE>\\))/mus';
 
     /**
      * @var array|bool[] List of tokens in format "[ token_name => kept_or_skipped ]"

@@ -20,7 +20,7 @@ interface Collection extends \IteratorAggregate, \Countable
      * @param Definition $definition
      * @return Collection
      */
-    public function append(Definition $definition): Collection;
+    public function append(Definition $definition): self;
 
     /**
      * @param string $name

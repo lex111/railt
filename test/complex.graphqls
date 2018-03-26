@@ -67,7 +67,7 @@ extend type Foo {
     seven(argument: [String]): Type
 }
 
-extend type Foo @onType {}
+extend type Foo @onType
 
 type NoFields {}
 

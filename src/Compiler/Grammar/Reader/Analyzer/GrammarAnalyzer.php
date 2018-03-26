@@ -11,7 +11,7 @@ namespace Railt\Compiler\Grammar\Reader\Analyzer;
 
 use Railt\Compiler\Grammar\Lexer\Grammar as T;
 use Railt\Compiler\Iterator\LookaheadIterator;
-use Railt\Compiler\Lexer\Result\Eof;
+use Railt\Compiler\Lexer\Result\Eoi;
 use Railt\Compiler\Parser\Rule\Choice;
 use Railt\Compiler\Parser\Rule\Concatenation;
 use Railt\Compiler\Parser\Rule\Repetition;
@@ -105,7 +105,7 @@ class GrammarAnalyzer extends BaseAnalyzer
     private function rules(array $rules): \Traversable
     {
         yield from $rules;
-        yield new Eof(0);
+        yield new Eoi(0);
     }
 
     /**

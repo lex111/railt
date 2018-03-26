@@ -10,7 +10,6 @@ declare(strict_types=1);
 namespace Railt\Compiler\Parser;
 
 use Railt\Compiler\Iterator\BufferedIterator;
-use Railt\Compiler\Lexer\TokenInterface;
 use Railt\Compiler\LexerInterface;
 use Railt\Compiler\Parser\Ast\Leaf;
 use Railt\Compiler\Parser\Ast\Node;
@@ -26,6 +25,7 @@ use Railt\Compiler\Parser\Rule\Repetition;
 use Railt\Compiler\Parser\Rule\Rule;
 use Railt\Compiler\Parser\Rule\Terminal;
 use Railt\Compiler\ParserInterface;
+use Railt\Compiler\TokenInterface;
 use Railt\Io\Readable;
 
 /**
@@ -107,7 +107,7 @@ abstract class Runtime implements ParserInterface
 
             if ($this->backtrack($buffer) === false) {
                 /** @var TokenInterface $token */
-                $token = $buffer->top();
+                $token = $buffer->last();
 
                 $error = \sprintf('Unexpected token %s', $token);
                 throw UnexpectedTokenException::fromFile($error, $input, $token->offset());
@@ -144,7 +144,6 @@ abstract class Runtime implements ParserInterface
      * Get root rule.
      *
      * @return string
-     * @throws ParserException
      */
     public function getRootRule(): string
     {
@@ -154,7 +153,7 @@ abstract class Runtime implements ParserInterface
             }
         }
 
-        throw new ParserException('Can not find root rule');
+        throw new \RuntimeException('Invalid grammar root rule (Can not find)');
     }
 
     /**

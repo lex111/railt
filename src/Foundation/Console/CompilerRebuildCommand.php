@@ -14,6 +14,7 @@ use Railt\Compiler\Generator\ParserGenerator;
 use Railt\Compiler\Grammar\ParsingResult;
 use Railt\Compiler\Grammar\Reader;
 use Railt\Io\File;
+use Railt\SDL\Parser\Factory;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -24,7 +25,6 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class CompilerRebuildCommand extends Command
 {
-    private const DEFAULT_GRAMMAR_FILE      = __DIR__ . '/../../SDL/resources/grammar/sdl.pp2';
     private const DEFAULT_PATH              = __DIR__ . '/../../SDL/Parser';
     private const DEFAULT_LEXER_CLASS_NAME  = '\\Railt\\SDL\\Parser\\SchemaLexer';
     private const DEFAULT_PARSER_CLASS_NAME = '\\Railt\\SDL\\Parser\\SchemaParser';
@@ -114,7 +114,7 @@ class CompilerRebuildCommand extends Command
             'grammar',
             InputArgument::OPTIONAL,
             'Input grammar file',
-            self::DEFAULT_GRAMMAR_FILE
+            Factory::GRAMMAR_FILE
         );
 
         $this->addArgument(

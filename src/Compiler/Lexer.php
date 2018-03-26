@@ -11,7 +11,7 @@ namespace Railt\Compiler;
 
 use Railt\Compiler\Lexer\Definition;
 use Railt\Compiler\Lexer\PCRECompiler;
-use Railt\Compiler\Lexer\Result\Eof;
+use Railt\Compiler\Lexer\Result\Eoi;
 use Railt\Compiler\Lexer\Result\Token;
 use Railt\Compiler\Lexer\Runtime;
 use Railt\Io\Readable;
@@ -44,7 +44,7 @@ class Lexer extends Runtime
      */
     public function eof(bool $keep = true): LexerInterface
     {
-        $this->compiler->addToken(new Definition(Eof::NAME, "\0"));
+        $this->compiler->addToken(new Definition(Eoi::NAME, "\0"));
 
         return parent::eof($keep);
     }

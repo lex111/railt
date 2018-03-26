@@ -7,12 +7,30 @@
  */
 declare(strict_types=1);
 
-use Railt\SDL\Compiler;
+use Railt\Compiler\Grammar\Lexer\Grammar;
+use Railt\Compiler\Grammar\Lexer\Runtime;
+use Railt\Compiler\Lexer;
+use Railt\Compiler\Lexer\NativeStateless;
+use Railt\Compiler\Lexer\Parle;
 use Railt\Io\File;
+use Railt\SDL\Parser\Factory;
 
 require __DIR__ . '/../vendor/autoload.php';
 
-$gql = File::fromPathname(__DIR__ . '/complex.graphqls');
+$schema = File::fromPathname(Factory::GRAMMAR_FILE);
 
-$compiler = new Compiler();
-$compiler->compile($gql);
+$lexer = new NativeStateless();
+//$lexer = new Parle();
+
+foreach (Runtime::getTokenDefinitions() as $name => $value) {
+    $lexer->add($name, $value, Runtime::getTokenContexts()[$name] ?? 0);
+}
+
+foreach (Runtime::getSkippedTokens() as $name) {
+    $lexer->skip($name);
+}
+
+
+foreach ($lexer->lex($schema) as $token) {
+    echo $token . "\n";
+}

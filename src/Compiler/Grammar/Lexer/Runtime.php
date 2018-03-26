@@ -11,7 +11,6 @@ namespace Railt\Compiler\Grammar\Lexer;
 
 use Railt\Compiler\Generator\LexerGenerator;
 use Railt\Compiler\Lexer;
-use Railt\Compiler\Lexer\Definition;
 use Railt\Compiler\LexerInterface;
 use Railt\Io\Readable;
 
@@ -78,6 +77,18 @@ abstract class Runtime
     ];
 
     /**
+     *  A list of token contexts
+     */
+    private const TOKEN_CONTEXTS = [
+        // self::T_INCLUDE         => 1,
+        // self::T_NODE_DEFINITION => 1,
+        // self::T_SKIPPED         => 1,
+        // self::T_KEPT            => 1,
+        // self::T_NAMED           => 1,
+        // self::T_NODE            => 1,
+    ];
+
+    /**
      * A list of skipped tokens
      */
     private const TOKENS_SKIP = [
@@ -105,25 +116,30 @@ abstract class Runtime
      */
     public static function new(): LexerInterface
     {
-        $runtime = new Lexer(static::getTokenDefinitions());
-        $runtime->dotAll(true);
-
-        return $runtime;
+        return new Lexer(static::getTokenDefinitions());
     }
 
     /**
-     * @return \Traversable|Definition[]
+     * @return iterable
      */
-    public static function getTokenDefinitions(): \Traversable
+    public static function getTokenDefinitions(): iterable
     {
-        foreach (self::TOKENS_LIST as $id => $value) {
-            $def = new Definition($id, $value);
+        return self::TOKENS_LIST;
+    }
 
-            if (\in_array($id, self::TOKENS_SKIP, true)) {
-                $def->skip();
-            }
+    /**
+     * @return iterable
+     */
+    public static function getSkippedTokens(): iterable
+    {
+        return self::TOKENS_SKIP;
+    }
 
-            yield $def;
-        }
+    /**
+     * @return iterable
+     */
+    public static function getTokenContexts(): iterable
+    {
+        return self::TOKEN_CONTEXTS;
     }
 }

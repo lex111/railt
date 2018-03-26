@@ -8,6 +8,7 @@
 declare(strict_types=1);
 
 namespace Railt\SDL\Compiler\Collections;
+
 use Railt\Reflection\Definition;
 
 /**
@@ -33,7 +34,7 @@ class Duplicator implements Collection
     public function __construct(Collection $context, Collection $duplicateTo)
     {
         $this->context = $context;
-        $this->target = $duplicateTo;
+        $this->target  = $duplicateTo;
     }
 
     /**
