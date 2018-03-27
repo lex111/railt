@@ -42,4 +42,10 @@ interface Stateless extends Stateful
      * @return iterable
      */
     public function getIgnoredTokens(): iterable;
+
+    /**
+     * @param string $name
+     * @return bool
+     */
+    public function has(string $name): bool;
 }

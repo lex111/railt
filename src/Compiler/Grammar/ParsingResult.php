@@ -14,7 +14,9 @@ use Railt\Compiler\Grammar\Reader\ProductionParser;
 use Railt\Compiler\Grammar\Reader\RuleAnalyzer;
 use Railt\Compiler\Grammar\Reader\TokenParser;
 use Railt\Compiler\Lexer;
+use Railt\Compiler\Lexer\NativeStateless;
 use Railt\Compiler\Lexer\Runtime as LexerRuntime;
+use Railt\Compiler\Lexer\Stateless;
 use Railt\Compiler\LexerInterface;
 use Railt\Compiler\Parser;
 use Railt\Compiler\Parser\Runtime as ParserRuntime;
@@ -41,7 +43,7 @@ class ParsingResult
     private $productions;
 
     /**
-     * @var LexerInterface|LexerRuntime
+     * @var Stateless
      */
     private $lexer;
 
@@ -76,12 +78,20 @@ class ParsingResult
     }
 
     /**
-     * @return LexerInterface|Lexer
+     * @return Stateless
      */
-    public function getLexer(): LexerInterface
+    public function getLexer(): Stateless
     {
         if ($this->lexer === null) {
-            $this->lexer = new Lexer($this->tokens->getTokens());
+            $this->lexer = new NativeStateless();
+
+            foreach ($this->tokens->getTokens() as $name => $pcre) {
+                $this->lexer->add($name, $pcre);
+            }
+
+            foreach ($this->tokens->getSkippedTokens() as $name) {
+                $this->lexer->skip($name);
+            }
         }
 
         return $this->lexer;

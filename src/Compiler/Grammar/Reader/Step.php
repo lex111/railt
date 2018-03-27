@@ -9,8 +9,7 @@ declare(strict_types=1);
 
 namespace Railt\Compiler\Grammar\Reader;
 
-use Railt\Compiler\Grammar\Reader;
-use Railt\Compiler\Lexer\TokenInterface;
+use Railt\Compiler\TokenInterface;
 use Railt\Io\Readable;
 
 /**
@@ -18,12 +17,6 @@ use Railt\Io\Readable;
  */
 interface Step
 {
-    /**
-     * GrammarRule constructor.
-     * @param Reader $reader
-     */
-    public function __construct(Reader $reader);
-
     /**
      * @param TokenInterface $token
      * @return bool

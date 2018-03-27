@@ -18,10 +18,7 @@ use Railt\Compiler\LexerInterface;
  */
 class LexerGenerator extends BaseCodeGenerator
 {
-    /**
-     * @var string
-     */
-    protected $template = 'lexer.php.twig';
+    private const DEFAULT_TEMPLATE = 'lexer/native.php.twig';
 
     /**
      * @var LexerInterface
@@ -31,10 +28,12 @@ class LexerGenerator extends BaseCodeGenerator
     /**
      * LexerGenerator constructor.
      * @param Stateless $lexer
+     * @param string $template
      */
-    public function __construct(Stateless $lexer)
+    public function __construct(Stateless $lexer, string $template = self::DEFAULT_TEMPLATE)
     {
         $this->lexer = $lexer;
+        $this->template = $template;
     }
 
     /**

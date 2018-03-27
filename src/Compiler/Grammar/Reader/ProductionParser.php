@@ -11,8 +11,7 @@ namespace Railt\Compiler\Grammar\Reader;
 
 use Railt\Compiler\Grammar\Exceptions\UnprocessableProductionException;
 use Railt\Compiler\Grammar\Lexer\Grammar;
-use Railt\Compiler\Grammar\Reader;
-use Railt\Compiler\Lexer\TokenInterface;
+use Railt\Compiler\TokenInterface;
 use Railt\Io\Readable;
 
 /**
@@ -39,11 +38,6 @@ class ProductionParser implements Step
     ];
 
     /**
-     * @var Reader
-     */
-    private $reader;
-
-    /**
      * @var array
      */
     private $rules = [];
@@ -54,21 +48,12 @@ class ProductionParser implements Step
     private $currentRule;
 
     /**
-     * TokenRule constructor.
-     * @param Reader $reader
-     */
-    public function __construct(Reader $reader)
-    {
-        $this->reader = $reader;
-    }
-
-    /**
      * @param TokenInterface $token
      * @return bool
      */
     public function match(TokenInterface $token): bool
     {
-        return $token->is(...self::PRODUCTION_TOKENS);
+        return \in_array($token->name(), self::PRODUCTION_TOKENS, true);
     }
 
     /**
@@ -77,8 +62,9 @@ class ProductionParser implements Step
      */
     public function parse(Readable $file, TokenInterface $token): void
     {
-        if ($token->is(Grammar::T_NODE_DEFINITION)) {
+        if ($token->name() === Grammar::T_NODE_DEFINITION) {
             $this->createRule($token);
+
             return;
         }
 
@@ -90,7 +76,8 @@ class ProductionParser implements Step
      */
     private function createRule(TokenInterface $token): void
     {
-        $this->currentRule               = $token->value(0);
+        $this->currentRule = $token->value(1);
+
         $this->rules[$this->currentRule] = [];
     }
 

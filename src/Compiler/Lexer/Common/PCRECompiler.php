@@ -8,6 +8,7 @@
 declare(strict_types=1);
 
 namespace Railt\Compiler\Lexer\Common;
+
 use Railt\Compiler\Lexer\Exceptions\BadLexemeException;
 use Railt\Compiler\TokenInterface;
 
@@ -18,8 +19,8 @@ class PCRECompiler
 {
     private const REGEX_DELIMITER = '/';
 
-    private const FLAG_UNICODE = 'u';
-    private const FLAG_DOT_ALL = 's';
+    private const FLAG_UNICODE  = 'u';
+    private const FLAG_DOT_ALL  = 's';
     private const FLAG_ANALYZED = 'S';
 
     /**
@@ -80,6 +81,15 @@ class PCRECompiler
     public function getTokens(): array
     {
         return $this->tokens;
+    }
+
+    /**
+     * @param string $name
+     * @return bool
+     */
+    public function has(string $name): bool
+    {
+        return \array_key_exists($name, $this->tokens);
     }
 
     /**

@@ -101,13 +101,13 @@ abstract class Runtime implements ParserInterface
         do {
             $out = $this->unfold($buffer);
 
-            if ($out !== null && $buffer->current()->isEof()) {
+            if ($out !== null && $buffer->current()->name() === TokenInterface::END_OF_INPUT) {
                 break;
             }
 
             if ($this->backtrack($buffer) === false) {
                 /** @var TokenInterface $token */
-                $token = $buffer->last();
+                $token = $buffer->top();
 
                 $error = \sprintf('Unexpected token %s', $token);
                 throw UnexpectedTokenException::fromFile($error, $input, $token->offset());

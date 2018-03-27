@@ -14,5 +14,4 @@ namespace Railt\Compiler\Lexer\Exceptions;
  */
 class BadLexemeException extends LexerException
 {
-
 }

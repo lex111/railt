@@ -19,7 +19,7 @@ class ParserGenerator extends BaseCodeGenerator
     /**
      * @var string
      */
-    protected $template = 'parser.php.twig';
+    protected $template = 'parser/llk.php.twig';
 
     /**
      * @var Parser

@@ -11,8 +11,7 @@ namespace Railt\Compiler\Grammar\Reader;
 
 use Railt\Compiler\Grammar\Lexer\Grammar;
 use Railt\Compiler\Grammar\Reader;
-use Railt\Compiler\Lexer\Definition;
-use Railt\Compiler\Lexer\TokenInterface;
+use Railt\Compiler\TokenInterface;
 use Railt\Io\Readable;
 
 /**
@@ -21,23 +20,14 @@ use Railt\Io\Readable;
 class TokenParser implements Step
 {
     /**
-     * @var Reader
-     */
-    private $reader;
-
-    /**
-     * @var array|Definition[]
+     * @var array|string[]
      */
     private $tokens = [];
 
     /**
-     * TokenRule constructor.
-     * @param Reader $reader
+     * @var array|string[]
      */
-    public function __construct(Reader $reader)
-    {
-        $this->reader = $reader;
-    }
+    private $skip = [];
 
     /**
      * @param TokenInterface $token
@@ -45,7 +35,7 @@ class TokenParser implements Step
      */
     public function match(TokenInterface $token): bool
     {
-        return $token->is(Grammar::T_TOKEN, Grammar::T_SKIP);
+        return \in_array($token->name(), [Grammar::T_TOKEN, Grammar::T_SKIP], true);
     }
 
     /**
@@ -54,20 +44,26 @@ class TokenParser implements Step
      */
     public function parse(Readable $file, TokenInterface $token): void
     {
-        $definition = new Definition($token->value(0), $token->value(1));
-
-        if ($token->is(Grammar::T_SKIP)) {
-            $definition->skip();
+        if ($token->name() === Grammar::T_SKIP) {
+            $this->skip[] = $token->value(1);
         }
 
-        $this->tokens[] = $definition;
+        $this->tokens[$token->value(1)] = $token->value(2);
     }
 
     /**
-     * @return array
+     * @return array|string[]
      */
     public function getTokens(): array
     {
         return $this->tokens;
+    }
+
+    /**
+     * @return array|string[]
+     */
+    public function getSkippedTokens(): array
+    {
+        return $this->skip;
     }
 }

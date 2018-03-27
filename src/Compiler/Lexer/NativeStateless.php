@@ -82,4 +82,13 @@ class NativeStateless extends NativeStateful implements Stateless
     {
         return $this->skipped;
     }
+
+    /**
+     * @param string $name
+     * @return bool
+     */
+    public function has(string $name): bool
+    {
+        return $this->pcre->has($name);
+    }
 }

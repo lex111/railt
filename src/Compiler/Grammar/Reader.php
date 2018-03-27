@@ -16,7 +16,7 @@ use Railt\Compiler\Grammar\Reader\PragmaParser;
 use Railt\Compiler\Grammar\Reader\ProductionParser;
 use Railt\Compiler\Grammar\Reader\Step;
 use Railt\Compiler\Grammar\Reader\TokenParser;
-use Railt\Compiler\Lexer\TokenInterface;
+use Railt\Compiler\TokenInterface;
 use Railt\Compiler\LexerInterface;
 use Railt\Compiler\Loggable;
 use Railt\Io\File;
@@ -110,11 +110,11 @@ class Reader
         $tokens = $this->lexer->lex($input);
 
         foreach ($tokens as $token) {
-            if ($token->isEof()) {
+            if ($token->name() === TokenInterface::END_OF_INPUT) {
                 continue;
             }
 
-            if ($token->is(Grammar::T_INCLUDE)) {
+            if ($token->name() === Grammar::T_INCLUDE) {
                 yield from $this->lex($this->include($input, $token));
                 continue;
             }
@@ -131,7 +131,7 @@ class Reader
      */
     private function include(Readable $from, TokenInterface $token): Readable
     {
-        $path = $token->value(0);
+        $path = $token->value(1);
 
         $this->log('Include "%s" from "%s"', $path, \realpath($from->getPathname()));
 

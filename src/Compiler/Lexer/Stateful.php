@@ -9,19 +9,12 @@ declare(strict_types=1);
 
 namespace Railt\Compiler\Lexer;
 
-use Railt\Io\Readable;
-use Railt\Compiler\TokenInterface;
+use Railt\Compiler\LexerInterface;
 
 /**
  * Interface Stateful
  */
-interface Stateful
+interface Stateful extends LexerInterface
 {
-    /**
-     * Compiling the current state of the lexer and returning stream tokens from the source file
-     *
-     * @param Readable $input
-     * @return \Traversable|TokenInterface[]|\Traversable
-     */
-    public function lex(Readable $input): \Traversable;
+
 }

@@ -17,6 +17,7 @@ use Railt\Compiler\Parser\Rule\Concatenation;
 use Railt\Compiler\Parser\Rule\Repetition;
 use Railt\Compiler\Parser\Rule\Rule;
 use Railt\Compiler\Parser\Rule\Terminal;
+use Railt\Compiler\TokenInterface;
 
 /**
  * Analyze rules and transform them into atomic rules operations.
@@ -344,7 +345,7 @@ class GrammarAnalyzer extends BaseAnalyzer
 
         if (
             $this->lookahead->key() === 0 &&
-            $this->lookahead->getNext()->isEof()
+            $this->lookahead->getNext()->name() === TokenInterface::END_OF_INPUT
         ) {
             $name                     = $this->transitionalRuleCounter++;
             $this->parsedRules[$name] = new Concatenation($name, [$tokenName]);

@@ -9,17 +9,16 @@ declare(strict_types=1);
 
 namespace Railt\Compiler\Lexer;
 
-use Illuminate\Support\Str;
 use Parle\Lexer;
 use Parle\LexerException;
 use Parle\Token as InternalToken;
 use Railt\Compiler\Lexer\Exceptions\BadLexemeException;
+use Railt\Compiler\Lexer\Exceptions\UnsupportedLexerRuntimeException;
 use Railt\Compiler\Lexer\Result\Eoi;
 use Railt\Compiler\Lexer\Result\Token;
 use Railt\Compiler\Lexer\Result\Unknown;
 use Railt\Compiler\TokenInterface;
 use Railt\Io\Readable;
-use Railt\Compiler\Lexer\Exceptions\UnsupportedLexerRuntimeException;
 
 /**
  * Class Parle
@@ -75,7 +74,7 @@ class Parle implements Stateless
         try {
             $this->lexer->push($pcre, $this->id);
 
-            $this->map[$this->id] = $name;
+            $this->map[$this->id]    = $name;
             $this->tokens[$this->id] = $pcre;
         } catch (LexerException $e) {
             $message = \preg_replace('/rule\h+id\h+\d+/iu', 'token ' . $name, $e->getMessage());
@@ -83,7 +82,7 @@ class Parle implements Stateless
             throw new BadLexemeException($message);
         }
 
-        $this->id++;
+        ++$this->id;
 
         return $this;
     }
@@ -160,5 +159,14 @@ class Parle implements Stateless
     public function getIgnoredTokens(): iterable
     {
         return \array_values($this->skip);
+    }
+
+    /**
+     * @param string $name
+     * @return bool
+     */
+    public function has(string $name): bool
+    {
+        return \in_array($name, $this->map, true);
     }
 }
