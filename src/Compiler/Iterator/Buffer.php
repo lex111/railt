@@ -16,18 +16,21 @@ interface Buffer extends \Iterator
 {
     /**
      * Peeks at the node from the end of the doubly linked list.
+     *
      * @return mixed The value of the last node.
      */
     public function top();
 
     /**
-     * Peeks at the node from the beginning of the doubly linked list
+     * Peeks at the node from the beginning of the doubly linked list.
+     *
      * @return mixed The value of the first node.
      */
     public function bottom();
 
     /**
-     * Move backward to previous element
+     * Move backward to previous element.
+     *
      * @return void Any returned value is ignored.
      */
     public function previous(): void;
