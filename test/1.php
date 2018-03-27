@@ -7,9 +7,7 @@
  */
 declare(strict_types=1);
 
-use Railt\Compiler\Grammar\Lexer\Grammar;
 use Railt\Compiler\Grammar\Lexer\Runtime;
-use Railt\Compiler\Lexer;
 use Railt\Compiler\Lexer\NativeStateless;
 use Railt\Compiler\Lexer\Parle;
 use Railt\Io\File;
