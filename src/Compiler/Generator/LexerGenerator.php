@@ -32,7 +32,7 @@ class LexerGenerator extends BaseCodeGenerator
      */
     public function __construct(Stateless $lexer, string $template = self::DEFAULT_TEMPLATE)
     {
-        $this->lexer = $lexer;
+        $this->lexer    = $lexer;
         $this->template = $template;
     }
 

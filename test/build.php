@@ -7,12 +7,12 @@
  */
 declare(strict_types=1);
 
-use Railt\Io\File;
 use Railt\Compiler\Parser;
+use Railt\Io\File;
 
 require __DIR__ . '/../vendor/autoload.php';
 
-$gql = File::fromPathname(__DIR__ . '/complex.graphqls');
+$gql     = File::fromPathname(__DIR__ . '/complex.graphqls');
 $grammar = File::fromPathname(__DIR__ . '/../src/SDL/resources/grammar/sdl.pp2');
 
 $ast = Parser::fromGrammar($grammar)->parse($gql);
