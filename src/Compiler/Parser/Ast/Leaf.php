@@ -20,11 +20,6 @@ class Leaf extends Node implements LeafInterface
     protected $value;
 
     /**
-     * @var int
-     */
-    protected $offset;
-
-    /**
      * Leaf constructor.
      * @param string $name
      * @param string $value
@@ -32,10 +27,9 @@ class Leaf extends Node implements LeafInterface
      */
     public function __construct(string $name, string $value, int $offset = 0)
     {
-        parent::__construct($name);
+        parent::__construct($name, $offset);
 
         $this->value     = $value;
-        $this->offset    = $offset;
     }
 
     /**
@@ -44,13 +38,5 @@ class Leaf extends Node implements LeafInterface
     public function getValue(): string
     {
         return $this->value;
-    }
-
-    /**
-     * @return int
-     */
-    public function getOffset(): int
-    {
-        return $this->offset;
     }
 }

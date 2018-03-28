@@ -22,12 +22,19 @@ abstract class Node implements NodeInterface
     protected $name;
 
     /**
+     * @var int
+     */
+    protected $offset;
+
+    /**
      * Node constructor.
      * @param string $name
+     * @param int $offset
      */
-    public function __construct(string $name)
+    public function __construct(string $name, int $offset = 0)
     {
         $this->name = $name;
+        $this->offset = $offset;
     }
 
     /**
@@ -45,6 +52,14 @@ abstract class Node implements NodeInterface
     public function is(string $name): bool
     {
         return $this->name === $name;
+    }
+
+    /**
+     * @return int
+     */
+    public function getOffset(): int
+    {
+        return $this->offset;
     }
 
     /**

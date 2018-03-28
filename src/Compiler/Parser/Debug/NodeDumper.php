@@ -85,6 +85,7 @@ class NodeDumper extends BaseDumper
 
         $node = $root->createElement(\class_basename($ast));
         $node->setAttribute('name', \ltrim($ast->getName(), '#'));
+        $node->setAttribute('offset', (string)$ast->getOffset());
 
         /** @var NodeInterface $child */
         foreach ($ast->getChildren() as $child) {

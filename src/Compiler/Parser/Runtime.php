@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Railt\Compiler\Parser;
 
+use Railt\Compiler\Iterator\Buffer;
 use Railt\Compiler\Iterator\BufferedIterator;
 use Railt\Compiler\LexerInterface;
 use Railt\Compiler\Parser\Ast\Leaf;
@@ -21,6 +22,7 @@ use Railt\Compiler\Parser\Rule\Choice;
 use Railt\Compiler\Parser\Rule\Concatenation;
 use Railt\Compiler\Parser\Rule\Entry;
 use Railt\Compiler\Parser\Rule\Escape;
+use Railt\Compiler\Parser\Rule\Invocation;
 use Railt\Compiler\Parser\Rule\Repetition;
 use Railt\Compiler\Parser\Rule\Rule;
 use Railt\Compiler\Parser\Rule\Terminal;
@@ -168,7 +170,7 @@ abstract class Runtime implements ParserInterface
 
             if ($rule instanceof Escape) {
                 $rule->setDepth($this->depth);
-                $this->trace[] = $rule;
+                $this->trace($rule, $buffer);
 
                 if ($rule->isTransitional() === false) {
                     --$this->depth;
@@ -219,7 +221,7 @@ abstract class Runtime implements ParserInterface
         }
 
         if ($rule instanceof Concatenation) {
-            $this->trace[] = new Entry($rule->getName(), 0, null, $this->depth);
+            $this->trace(new Entry($rule->getName(), 0, null, $this->depth), $buffer);
             $children      = $rule->getChildren();
 
             for ($i = \count($children) - 1; $i >= 0; --$i) {
@@ -238,7 +240,7 @@ abstract class Runtime implements ParserInterface
                 return false;
             }
 
-            $this->trace[] = new Entry($rule->getName(), $next, $this->todo, $this->depth);
+            $this->trace(new Entry($rule->getName(), $next, $this->todo, $this->depth), $buffer);
             $nextRule      = $children[$next];
             $this->todo[]  = new Escape($nextRule, 0);
             $this->todo[]  = new Entry($nextRule, 0);
@@ -253,8 +255,9 @@ abstract class Runtime implements ParserInterface
                 $name = $rule->getName();
                 $min  = $rule->getMin();
 
-                $this->trace[] = new Entry($name, $min, null, $this->depth);
+                $this->trace(new Entry($name, $min, null, $this->depth), $buffer);
                 \array_pop($this->todo);
+
                 $this->todo[] = new Escape($name, $min, $this->todo);
 
                 for ($i = 0; $i < $min; ++$i) {
@@ -279,6 +282,16 @@ abstract class Runtime implements ParserInterface
         }
 
         return false;
+    }
+
+    /**
+     * @param Invocation $invocation
+     * @param Buffer $buffer
+     */
+    private function trace(Invocation $invocation, Buffer $buffer): void
+    {
+        $this->trace[] = $invocation;
+        $invocation->at($buffer->current()->offset());
     }
 
     /**
@@ -350,6 +363,7 @@ abstract class Runtime implements ParserInterface
                 $isRule    = $trace->isTransitional() === false;
                 $nextTrace = $this->trace[$i + 1];
                 $id        = $rule->getNodeId();
+                $offset    = $trace->getOffset();
 
                 // Optimization: Skip empty trace sequence.
                 if ($nextTrace instanceof Escape && $ruleName === $nextTrace->getRule()) {
@@ -397,8 +411,8 @@ abstract class Runtime implements ParserInterface
                     continue;
                 }
 
-                $cTree      = new AstRule((string)($id ?: $cId), \array_reverse($handle));
-                $children[] = $cTree;
+                $rule = new AstRule((string)($id ?: $cId), \array_reverse($handle), $offset);
+                $children[] = $rule;
             } elseif ($trace instanceof Escape) {
                 return $i + 1;
             } else {
