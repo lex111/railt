@@ -7,34 +7,46 @@
  */
 declare(strict_types=1);
 
-namespace Railt\Compiler\Parser\Ast;
-
-use Railt\Compiler\Parser\Debug\NodeDumper;
+namespace Railt\Compiler\Parser\Trace;
 
 /**
- * Class Node
+ * Class Terminator
  */
-abstract class Node implements NodeInterface
+class Terminator
 {
     /**
      * @var string
      */
-    protected $name;
+    private $name;
+
+    /**
+     * @var string
+     */
+    private $value;
 
     /**
      * @var int
      */
-    protected $offset;
+    private $offset;
 
     /**
-     * Node constructor.
-     * @param string $name
-     * @param int $offset
+     * @var bool
      */
-    public function __construct(string $name, int $offset = 0)
+    private $kept;
+
+    /**
+     * Terminator constructor.
+     * @param string $name
+     * @param string $value
+     * @param int $offset
+     * @param bool $kept
+     */
+    public function __construct(string $name, string $value, int $offset, bool $kept = true)
     {
         $this->name   = $name;
+        $this->value  = $value;
         $this->offset = $offset;
+        $this->kept   = $kept;
     }
 
     /**
@@ -46,12 +58,11 @@ abstract class Node implements NodeInterface
     }
 
     /**
-     * @param string $name
-     * @return bool
+     * @return string
      */
-    public function is(string $name): bool
+    public function getValue(): string
     {
-        return $this->name === $name;
+        return $this->value;
     }
 
     /**
@@ -63,10 +74,10 @@ abstract class Node implements NodeInterface
     }
 
     /**
-     * @return string
+     * @return bool
      */
-    public function __toString(): string
+    public function isKept(): bool
     {
-        return (new NodeDumper($this))->toString();
+        return $this->kept;
     }
 }

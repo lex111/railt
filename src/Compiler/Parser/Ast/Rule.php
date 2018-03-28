@@ -24,9 +24,9 @@ class Rule extends Node implements RuleInterface
      * @param string $name
      * @param iterable $children
      */
-    public function __construct(string $name, iterable $children = [])
+    public function __construct(string $name, iterable $children = [], int $offset = 0)
     {
-        parent::__construct($name);
+        parent::__construct($name, $offset);
         $this->children = $children;
     }
 

@@ -20,6 +20,11 @@ interface NodeInterface
     public function getName(): string;
 
     /**
+     * @return int
+     */
+    public function getOffset(): int;
+
+    /**
      * @param string $name
      * @return bool
      */

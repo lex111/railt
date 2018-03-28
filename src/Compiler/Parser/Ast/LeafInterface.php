@@ -18,9 +18,4 @@ interface LeafInterface extends NodeInterface
      * @return string
      */
     public function getValue(): string;
-
-    /**
-     * @return int
-     */
-    public function getOffset(): int;
 }

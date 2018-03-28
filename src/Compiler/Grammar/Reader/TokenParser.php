@@ -10,7 +10,6 @@ declare(strict_types=1);
 namespace Railt\Compiler\Grammar\Reader;
 
 use Railt\Compiler\Grammar\Lexer\Grammar;
-use Railt\Compiler\Grammar\Reader;
 use Railt\Compiler\TokenInterface;
 use Railt\Io\Readable;
 

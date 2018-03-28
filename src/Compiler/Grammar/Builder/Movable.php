@@ -7,17 +7,21 @@
  */
 declare(strict_types=1);
 
-namespace Railt\Compiler\Parser\Rule;
+namespace Railt\Compiler\Grammar\Builder;
 
 /**
- * Interface Terminal
+ * Trait Movable
  */
-interface Terminal extends Symbol
+trait Movable
 {
     /**
-     * Returns the name of the Token.
-     *
-     * @return string
+     * @param string|int $to
+     * @return Buildable
      */
-    public function getName(): string;
+    public function move($to): Buildable
+    {
+        $this->id = $to;
+
+        return $this;
+    }
 }

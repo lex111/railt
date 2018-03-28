@@ -9,15 +9,13 @@ declare(strict_types=1);
 
 namespace Railt\Compiler\Grammar;
 
+use Railt\Compiler\Grammar\Builder\Buildable;
 use Railt\Compiler\Grammar\Reader\PragmaParser;
 use Railt\Compiler\Grammar\Reader\ProductionParser;
 use Railt\Compiler\Grammar\Reader\RuleAnalyzer;
 use Railt\Compiler\Grammar\Reader\TokenParser;
-use Railt\Compiler\Lexer;
 use Railt\Compiler\Lexer\NativeStateless;
-use Railt\Compiler\Lexer\Runtime as LexerRuntime;
 use Railt\Compiler\Lexer\Stateless;
-use Railt\Compiler\LexerInterface;
 use Railt\Compiler\Parser;
 use Railt\Compiler\Parser\Runtime as ParserRuntime;
 use Railt\Compiler\ParserInterface;
@@ -71,7 +69,7 @@ class ParsingResult
     public function getParser(): ParserInterface
     {
         if ($this->parser === null) {
-            $this->parser = new Parser($this->getLexer(), $this->getRules());
+            $this->parser = new Parser($this->getLexer(), $this->getBuilders());
         }
 
         return $this->parser;
@@ -102,10 +100,22 @@ class ParsingResult
      */
     public function getRules(): array
     {
+        $result = [];
+
+        foreach ($this->getBuilders() as $key => $builder) {
+            $result[$key] = $builder->toRule();
+        }
+
+        return $result;
+    }
+
+    /**
+     * @return array|Buildable[]
+     */
+    public function getBuilders(): iterable
+    {
         $analyzer = new RuleAnalyzer($this->getLexer());
 
-        $result = $analyzer->analyze($this->productions->getRules());
-
-        return $result instanceof \Traversable ? \iterator_to_array($result) : $result;
+        return $analyzer->analyze($this->productions->getRules());
     }
 }

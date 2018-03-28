@@ -7,15 +7,11 @@
  */
 declare(strict_types=1);
 
-namespace Railt\Compiler\Parser\Rule;
+namespace Railt\Compiler\Parser\Trace;
 
 /**
- * Interface Arrayable
+ * Class Entry
  */
-interface Arrayable
+class Entry extends Invocation
 {
-    /**
-     * @return array
-     */
-    public function toArray(): array;
 }

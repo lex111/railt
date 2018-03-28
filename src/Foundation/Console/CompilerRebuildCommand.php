@@ -9,7 +9,6 @@ declare(strict_types=1);
 
 namespace Railt\Foundation\Console;
 
-use Railt\Compiler\Generator\LexerGenerator;
 use Railt\Compiler\Generator\ParserGenerator;
 use Railt\Compiler\Grammar\ParsingResult;
 use Railt\Compiler\Grammar\Reader;
@@ -26,7 +25,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 class CompilerRebuildCommand extends Command
 {
     private const DEFAULT_PATH              = __DIR__ . '/../../SDL/Parser';
-    private const DEFAULT_LEXER_CLASS_NAME  = '\\Railt\\SDL\\Parser\\SchemaLexer';
     private const DEFAULT_PARSER_CLASS_NAME = '\\Railt\\SDL\\Parser\\SchemaParser';
 
     /**
@@ -43,27 +41,9 @@ class CompilerRebuildCommand extends Command
         $grammar = File::fromPathname($in->getArgument('grammar'));
         $reader  = (new Reader())->read($grammar);
 
-        $this->buildLexer($in, $reader);
         $this->buildParser($in, $reader);
 
         $out->writeln('<info>OK</info>');
-    }
-
-    /**
-     * @param InputInterface $in
-     * @param ParsingResult $reader
-     * @throws \RuntimeException
-     * @throws \Railt\Io\Exceptions\NotReadableException
-     * @throws \Symfony\Component\Console\Exception\InvalidArgumentException
-     */
-    private function buildLexer(InputInterface $in, ParsingResult $reader): void
-    {
-        [$class, $namespace] = $this->split($in->getArgument('lexer'));
-
-        $lexer = new LexerGenerator($reader->getLexer());
-        $lexer->class($class);
-        $lexer->namespace($namespace);
-        $lexer->build()->saveTo($in->getArgument('output'));
     }
 
     /**
@@ -88,7 +68,7 @@ class CompilerRebuildCommand extends Command
     {
         [$class, $namespace] = $this->split($in->getArgument('parser'));
 
-        $lexer = new ParserGenerator($reader->getParser(), $in->getArgument('lexer'));
+        $lexer = new ParserGenerator($reader);
         $lexer->class($class);
         $lexer->namespace($namespace);
         $lexer->build()->saveTo($in->getArgument('output'));
@@ -115,13 +95,6 @@ class CompilerRebuildCommand extends Command
             InputArgument::OPTIONAL,
             'Input grammar file',
             Factory::GRAMMAR_FILE
-        );
-
-        $this->addArgument(
-            'lexer',
-            InputArgument::OPTIONAL,
-            'The lexer output class name',
-            self::DEFAULT_LEXER_CLASS_NAME
         );
 
         $this->addArgument(

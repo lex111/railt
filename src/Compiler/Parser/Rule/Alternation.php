@@ -10,8 +10,8 @@ declare(strict_types=1);
 namespace Railt\Compiler\Parser\Rule;
 
 /**
- * Class Choice
+ * Class Alternation
  */
-class Choice extends Rule
+class Alternation extends BaseProduction
 {
 }

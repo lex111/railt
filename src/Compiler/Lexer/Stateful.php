@@ -16,5 +16,4 @@ use Railt\Compiler\LexerInterface;
  */
 interface Stateful extends LexerInterface
 {
-
 }

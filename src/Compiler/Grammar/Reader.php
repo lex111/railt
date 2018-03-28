@@ -16,9 +16,9 @@ use Railt\Compiler\Grammar\Reader\PragmaParser;
 use Railt\Compiler\Grammar\Reader\ProductionParser;
 use Railt\Compiler\Grammar\Reader\Step;
 use Railt\Compiler\Grammar\Reader\TokenParser;
-use Railt\Compiler\TokenInterface;
 use Railt\Compiler\LexerInterface;
 use Railt\Compiler\Loggable;
+use Railt\Compiler\TokenInterface;
 use Railt\Io\File;
 use Railt\Io\Readable;
 

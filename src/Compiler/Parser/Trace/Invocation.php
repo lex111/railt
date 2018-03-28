@@ -7,7 +7,7 @@
  */
 declare(strict_types=1);
 
-namespace Railt\Compiler\Parser\Rule;
+namespace Railt\Compiler\Parser\Trace;
 
 /**
  * Class Invocation
@@ -40,7 +40,7 @@ abstract class Invocation
      *
      * @var int
      */
-    protected $depth        = -1;
+    protected $depth = -1;
 
     /**
      * Whether the rule is transitional or not (i.e. not declared in the grammar
@@ -51,24 +51,80 @@ abstract class Invocation
     protected $transitional = false;
 
     /**
+     * @var int
+     */
+    private $offset = 0;
+
+    /**
      * Constructor.
      *
-     * @param string $rule Rule name.
+     * @param string|int $rule Rule name.
      * @param mixed $data Data.
-     * @param array $todo Todo.
+     * @param array $then Next step jumpers
      * @param int $depth Depth.
      */
-    public function __construct(
-        $rule,
-        $data,
-        array $todo = null,
-        $depth      = -1
-    ) {
+    public function __construct($rule, int $data, array $then = null, int $depth = -1)
+    {
         $this->rule         = $rule;
-        $this->data         = $data;
-        $this->todo         = $todo;
-        $this->depth        = $depth;
         $this->transitional = \is_int($rule);
+
+        $this->data         = $data;
+        $this->todo         = $then;
+        $this->depth        = $depth;
+    }
+
+    /**
+     * @param int $depth
+     * @return Invocation
+     */
+    public function in(int $depth): self
+    {
+        $this->depth = $depth;
+
+        return $this;
+    }
+
+    /**
+     * @param int $data
+     * @return Invocation
+     */
+    public function with(int $data): self
+    {
+        $this->data = $data;
+
+        return $this;
+    }
+
+    /**
+     * @param array $jumps
+     * @return Invocation
+     */
+    public function then(array $jumps): self
+    {
+        $this->todo = $jumps;
+
+        return $this;
+    }
+
+    /**
+     * @param string|int $rule
+     * @param int $data
+     * @return static
+     */
+    public static function new($rule, int $data = 0)
+    {
+        return new static($rule, $data);
+    }
+
+    /**
+     * @param int $offset
+     * @return Invocation
+     */
+    public function at(int $offset): self
+    {
+        $this->offset = $offset;
+
+        return $this;
     }
 
     /**
@@ -102,20 +158,6 @@ abstract class Invocation
     }
 
     /**
-     * Set depth in trace.
-     *
-     * @param int $depth Depth.
-     * @return  int
-     */
-    public function setDepth($depth)
-    {
-        $old          = $this->depth;
-        $this->depth  = $depth;
-
-        return $old;
-    }
-
-    /**
      * Get depth in trace.
      *
      * @return  int
@@ -123,6 +165,28 @@ abstract class Invocation
     public function getDepth()
     {
         return $this->depth;
+    }
+
+    /**
+     * @return int
+     */
+    public function getOffset(): int
+    {
+        return $this->offset;
+    }
+
+    /**
+     * Set depth in trace.
+     *
+     * @param int $depth Depth.
+     * @return  int
+     */
+    public function setDepth($depth)
+    {
+        $old         = $this->depth;
+        $this->depth = $depth;
+
+        return $old;
     }
 
     /**

@@ -12,6 +12,6 @@ namespace Railt\Compiler\Parser\Rule;
 /**
  * Class Concatenation
  */
-class Concatenation extends Rule
+class Concatenation extends BaseProduction
 {
 }

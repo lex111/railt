@@ -7,11 +7,11 @@
  */
 declare(strict_types=1);
 
-namespace Railt\Compiler\Parser\Rule;
+namespace Railt\Compiler\Parser\Trace;
 
 /**
- * Class Entry
+ * Class Ekzit
  */
-class Entry extends Invocation
+class Escape extends Invocation
 {
 }

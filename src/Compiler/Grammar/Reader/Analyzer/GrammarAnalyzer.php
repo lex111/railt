@@ -9,14 +9,15 @@ declare(strict_types=1);
 
 namespace Railt\Compiler\Grammar\Reader\Analyzer;
 
+use Railt\Compiler\Grammar\Builder\AlternationBuilder;
+use Railt\Compiler\Grammar\Builder\Buildable;
+use Railt\Compiler\Grammar\Builder\ConcatenationBuilder;
+use Railt\Compiler\Grammar\Builder\Movable;
+use Railt\Compiler\Grammar\Builder\RepetitionBuilder;
+use Railt\Compiler\Grammar\Builder\TokenBuilder;
 use Railt\Compiler\Grammar\Lexer\Grammar as T;
 use Railt\Compiler\Iterator\LookaheadIterator;
 use Railt\Compiler\Lexer\Result\Eoi;
-use Railt\Compiler\Parser\Rule\Choice;
-use Railt\Compiler\Parser\Rule\Concatenation;
-use Railt\Compiler\Parser\Rule\Repetition;
-use Railt\Compiler\Parser\Rule\Rule;
-use Railt\Compiler\Parser\Rule\Terminal;
 use Railt\Compiler\TokenInterface;
 
 /**
@@ -88,12 +89,12 @@ class GrammarAnalyzer extends BaseAnalyzer
                 throw new \RuntimeException(\sprintf('Error while parsing rule %s.', $key), 1);
             }
 
-            /** @var Rule $zeRule */
-            $zeRule = $this->parsedRules[$rule];
-            $zeRule->setName($key);
+            /** @var Buildable|Movable $symbol */
+            $symbol = $this->parsedRules[$rule];
+            $symbol->move($key);
 
             unset($this->parsedRules[$rule]);
-            $this->parsedRules[$key] = $zeRule;
+            $this->parsedRules[$key] = $symbol;
         }
 
         return $this->parsedRules;
@@ -139,7 +140,7 @@ class GrammarAnalyzer extends BaseAnalyzer
         }
 
         if ($nNodeId !== null) {
-            $this->parsedRules[$rule]->setNodeId($nNodeId);
+            $this->parsedRules[$rule]->rename($nNodeId);
         }
 
         $children[] = $rule;
@@ -157,7 +158,7 @@ class GrammarAnalyzer extends BaseAnalyzer
             }
 
             if (null !== $nNodeId) {
-                $this->parsedRules[$rule]->setNodeId($nNodeId);
+                $this->parsedRules[$rule]->rename($nNodeId);
             }
 
             $children[] = $rule;
@@ -169,8 +170,9 @@ class GrammarAnalyzer extends BaseAnalyzer
             return $rule;
         }
 
-        $name                     = $this->transitionalRuleCounter++;
-        $this->parsedRules[$name] = new Choice($name, $children);
+        $name = $this->transitionalRuleCounter++;
+
+        $this->parsedRules[$name] = new AlternationBuilder($name, $children);
 
         return $name;
     }
@@ -205,8 +207,9 @@ class GrammarAnalyzer extends BaseAnalyzer
             return $rule;
         }
 
-        $name                     = $this->transitionalRuleCounter++;
-        $this->parsedRules[$name] = new Concatenation($name, $children);
+        $name = $this->transitionalRuleCounter++;
+
+        $this->parsedRules[$name] = new ConcatenationBuilder($name, $children);
 
         return $name;
     }
@@ -292,8 +295,9 @@ class GrammarAnalyzer extends BaseAnalyzer
             throw new \RuntimeException($error, 2);
         }
 
-        $name                     = $this->transitionalRuleCounter++;
-        $this->parsedRules[$name] = new Repetition($name, $min, $max, $children, null);
+        $name = $this->transitionalRuleCounter++;
+
+        $this->parsedRules[$name] = new RepetitionBuilder($name, $min, $max, (array)$children);
 
         return $name;
     }
@@ -348,7 +352,8 @@ class GrammarAnalyzer extends BaseAnalyzer
             $this->lookahead->getNext()->name() === TokenInterface::END_OF_INPUT
         ) {
             $name                     = $this->transitionalRuleCounter++;
-            $this->parsedRules[$name] = new Concatenation($name, [$tokenName]);
+
+            $this->parsedRules[$name] = new ConcatenationBuilder($name, (array)$tokenName);
         } else {
             $name = $tokenName;
         }
@@ -371,8 +376,9 @@ class GrammarAnalyzer extends BaseAnalyzer
             throw new \RuntimeException($error, 4);
         }
 
-        $name                     = $this->transitionalRuleCounter++;
-        $this->parsedRules[$name] = new Terminal($name, $tokenName, null, $kept);
+        $name = $this->transitionalRuleCounter++;
+
+        $this->parsedRules[$name] = new TokenBuilder($name, $tokenName, $kept);
         $this->lookahead->next();
 
         return $name;

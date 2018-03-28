@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Railt\Compiler\Parser;
 
 use Railt\Compiler\Iterator\Buffer;
+use Railt\Compiler\Iterator\BufferedIterator;
 use Railt\Compiler\LexerInterface;
 use Railt\Compiler\Parser\Ast\Leaf;
 use Railt\Compiler\Parser\Ast\Node;
@@ -17,13 +18,15 @@ use Railt\Compiler\Parser\Ast\NodeInterface;
 use Railt\Compiler\Parser\Ast\Rule as AstRule;
 use Railt\Compiler\Parser\Exceptions\ParserException;
 use Railt\Compiler\Parser\Exceptions\UnexpectedTokenException;
-use Railt\Compiler\Parser\Rule\Choice;
+use Railt\Compiler\Parser\Rule\Alternation;
 use Railt\Compiler\Parser\Rule\Concatenation;
-use Railt\Compiler\Parser\Rule\Entry;
-use Railt\Compiler\Parser\Rule\Escape;
 use Railt\Compiler\Parser\Rule\Repetition;
-use Railt\Compiler\Parser\Rule\Rule;
-use Railt\Compiler\Parser\Rule\Terminal;
+use Railt\Compiler\Parser\Rule\Symbol;
+use Railt\Compiler\Parser\Rule\Token;
+use Railt\Compiler\Parser\Trace\Entry;
+use Railt\Compiler\Parser\Trace\Escape;
+use Railt\Compiler\Parser\Trace\Invocation;
+use Railt\Compiler\Parser\Trace\Terminator;
 use Railt\Compiler\ParserInterface;
 use Railt\Compiler\TokenInterface;
 use Railt\Io\Readable;
@@ -86,7 +89,7 @@ abstract class Runtime implements ParserInterface
      */
     public function parse(Readable $input): NodeInterface
     {
-        $buffer = new Buffer($this->lex($input), 1024);
+        $buffer = new BufferedIterator($this->lex($input), 1024);
         $buffer->rewind();
 
         $this->trace = [];
@@ -158,17 +161,17 @@ abstract class Runtime implements ParserInterface
 
     /**
      * Unfold trace
-     * @param Buffer $buffer
+     * @param BufferedIterator $buffer
      * @return mixed
      */
-    protected function unfold(Buffer $buffer)
+    protected function unfold(BufferedIterator $buffer)
     {
         while (0 < \count($this->todo)) {
             $rule = \array_pop($this->todo);
 
             if ($rule instanceof Escape) {
                 $rule->setDepth($this->depth);
-                $this->trace[] = $rule;
+                $this->trace($rule, $buffer);
 
                 if ($rule->isTransitional() === false) {
                     --$this->depth;
@@ -187,17 +190,17 @@ abstract class Runtime implements ParserInterface
 
     /**
      * Parse current rule
-     * @param Buffer $buffer
-     * @param Rule $rule Current rule.
+     * @param BufferedIterator $buffer
+     * @param Symbol $rule Current rule.
      * @param int $next Next rule index.
      * @return bool
      */
-    protected function parseCurrentRule(Buffer $buffer, Rule $rule, $next): bool
+    protected function parseCurrentRule(BufferedIterator $buffer, Symbol $rule, $next): bool
     {
-        if ($rule instanceof Terminal) {
+        if ($rule instanceof Token) {
             $name = $buffer->current()->name();
 
-            if ($rule->getTokenName() !== $name) {
+            if ($rule->getName() !== $name) {
                 return false;
             }
 
@@ -207,20 +210,16 @@ abstract class Runtime implements ParserInterface
 
             $offset = $current->offset();
 
-            $leaf = clone $rule;
-            $leaf->setValue($value);
-            $leaf->setOffset($offset);
-
             \array_pop($this->todo);
-            $this->trace[] = $leaf;
+            $this->trace[] = new Terminator($rule->getName(), $value, $offset, $rule->isKept());
             $buffer->next();
 
             return true;
         }
 
         if ($rule instanceof Concatenation) {
-            $this->trace[] = new Entry($rule->getName(), 0, null, $this->depth);
-            $children      = $rule->getChildren();
+            $this->trace(new Entry($rule->getId(), 0, null, $this->depth), $buffer);
+            $children      = $rule->then();
 
             for ($i = \count($children) - 1; $i >= 0; --$i) {
                 $nextRule     = $children[$i];
@@ -231,14 +230,15 @@ abstract class Runtime implements ParserInterface
             return true;
         }
 
-        if ($rule instanceof Choice) {
-            $children = $rule->getChildren();
+        if ($rule instanceof Alternation) {
+            $children = $rule->then();
 
             if ($next >= \count($children)) {
                 return false;
             }
 
-            $this->trace[] = new Entry($rule->getName(), $next, $this->todo, $this->depth);
+            $this->trace(new Entry($rule->getId(), $next, $this->todo, $this->depth), $buffer);
+            /** @var string|int $nextRule */
             $nextRule      = $children[$next];
             $this->todo[]  = new Escape($nextRule, 0);
             $this->todo[]  = new Entry($nextRule, 0);
@@ -247,14 +247,15 @@ abstract class Runtime implements ParserInterface
         }
 
         if ($rule instanceof Repetition) {
-            $nextRule = $rule->getChildren();
+            $nextRule = $rule->then()[0];
 
             if ($next === 0) {
-                $name = $rule->getName();
-                $min  = $rule->getMin();
+                $name = $rule->getId();
+                $min  = $rule->from();
 
-                $this->trace[] = new Entry($name, $min, null, $this->depth);
+                $this->trace(new Entry($name, $min, null, $this->depth), $buffer);
                 \array_pop($this->todo);
+
                 $this->todo[] = new Escape($name, $min, $this->todo);
 
                 for ($i = 0; $i < $min; ++$i) {
@@ -265,13 +266,13 @@ abstract class Runtime implements ParserInterface
                 return true;
             }
 
-            $max = $rule->getMax();
+            $max = $rule->to();
 
             if ($max !== Repetition::INF_MAX_VALUE && $next > $max) {
                 return false;
             }
 
-            $this->todo[] = new Escape($rule->getName(), $next, $this->todo);
+            $this->todo[] = new Escape($rule->getId(), $next, $this->todo);
             $this->todo[] = new Escape($nextRule, 0);
             $this->todo[] = new Entry($nextRule, 0);
 
@@ -282,12 +283,22 @@ abstract class Runtime implements ParserInterface
     }
 
     /**
+     * @param Invocation $invocation
+     * @param Buffer $buffer
+     */
+    private function trace(Invocation $invocation, Buffer $buffer): void
+    {
+        $this->trace[] = $invocation;
+        $invocation->at($buffer->current()->offset());
+    }
+
+    /**
      * Get rule by name.
      *
      * @param $name
-     * @return Rule|null
+     * @return Symbol|null
      */
-    public function getRule($name): ?Rule
+    public function getRule($name): ?Symbol
     {
         return $this->rules[$name] ?? null;
     }
@@ -295,10 +306,10 @@ abstract class Runtime implements ParserInterface
     /**
      * Backtrack the trace.
      *
-     * @param Buffer $buffer
+     * @param BufferedIterator $buffer
      * @return bool
      */
-    protected function backtrack(Buffer $buffer): bool
+    protected function backtrack(BufferedIterator $buffer): bool
     {
         $found = false;
 
@@ -306,10 +317,10 @@ abstract class Runtime implements ParserInterface
             $last = \array_pop($this->trace);
 
             if ($last instanceof Entry) {
-                $found = $this->getRule($last->getRule()) instanceof Choice;
+                $found = $this->getRule($last->getRule()) instanceof Alternation;
             } elseif ($last instanceof Escape) {
                 $found = $this->getRule($last->getRule()) instanceof Repetition;
-            } elseif ($last instanceof Terminal) {
+            } elseif ($last instanceof Terminator) {
                 $buffer->previous();
 
                 if ($buffer->valid() === false) {
@@ -342,6 +353,7 @@ abstract class Runtime implements ParserInterface
         $max = \count($this->trace);
 
         while ($i < $max) {
+            /** @var Invocation|Terminator $trace */
             $trace = $this->trace[$i];
 
             if ($trace instanceof Entry) {
@@ -349,7 +361,8 @@ abstract class Runtime implements ParserInterface
                 $rule      = $this->rules[$ruleName];
                 $isRule    = $trace->isTransitional() === false;
                 $nextTrace = $this->trace[$i + 1];
-                $id        = $rule->getNodeId();
+                $id        = $rule->getName();
+                $offset    = $trace->getOffset();
 
                 // Optimization: Skip empty trace sequence.
                 if ($nextTrace instanceof Escape && $ruleName === $nextTrace->getRule()) {
@@ -397,8 +410,8 @@ abstract class Runtime implements ParserInterface
                     continue;
                 }
 
-                $cTree      = new AstRule((string)($id ?: $cId), \array_reverse($handle));
-                $children[] = $cTree;
+                $rule       = new AstRule((string)($id ?: $cId), \array_reverse($handle), $offset);
+                $children[] = $rule;
             } elseif ($trace instanceof Escape) {
                 return $i + 1;
             } else {
@@ -408,7 +421,7 @@ abstract class Runtime implements ParserInterface
                     continue;
                 }
 
-                $children[] = new Leaf($trace->getTokenName(), $trace->getValue(), $trace->getOffset());
+                $children[] = new Leaf($trace->getName(), $trace->getValue(), $trace->getOffset());
                 ++$i;
             }
         }
