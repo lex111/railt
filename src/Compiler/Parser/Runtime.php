@@ -9,7 +9,7 @@ declare(strict_types=1);
 
 namespace Railt\Compiler\Parser;
 
-use Railt\Compiler\Iterator\BufferedIterator;
+use Railt\Compiler\Iterator\Buffer;
 use Railt\Compiler\LexerInterface;
 use Railt\Compiler\Parser\Ast\Leaf;
 use Railt\Compiler\Parser\Ast\Node;
@@ -86,7 +86,7 @@ abstract class Runtime implements ParserInterface
      */
     public function parse(Readable $input): NodeInterface
     {
-        $buffer = new BufferedIterator($this->lex($input), 1024);
+        $buffer = new Buffer($this->lex($input), 1024);
         $buffer->rewind();
 
         $this->trace = [];
@@ -158,10 +158,10 @@ abstract class Runtime implements ParserInterface
 
     /**
      * Unfold trace
-     * @param BufferedIterator $buffer
+     * @param Buffer $buffer
      * @return mixed
      */
-    protected function unfold(BufferedIterator $buffer)
+    protected function unfold(Buffer $buffer)
     {
         while (0 < \count($this->todo)) {
             $rule = \array_pop($this->todo);
@@ -187,12 +187,12 @@ abstract class Runtime implements ParserInterface
 
     /**
      * Parse current rule
-     * @param BufferedIterator $buffer
+     * @param Buffer $buffer
      * @param Rule $rule Current rule.
      * @param int $next Next rule index.
      * @return bool
      */
-    protected function parseCurrentRule(BufferedIterator $buffer, Rule $rule, $next): bool
+    protected function parseCurrentRule(Buffer $buffer, Rule $rule, $next): bool
     {
         if ($rule instanceof Terminal) {
             $name = $buffer->current()->name();
@@ -295,10 +295,10 @@ abstract class Runtime implements ParserInterface
     /**
      * Backtrack the trace.
      *
-     * @param BufferedIterator $buffer
+     * @param Buffer $buffer
      * @return bool
      */
-    protected function backtrack(BufferedIterator $buffer): bool
+    protected function backtrack(Buffer $buffer): bool
     {
         $found = false;
 

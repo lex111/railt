@@ -10,28 +10,124 @@ declare(strict_types=1);
 namespace Railt\Compiler\Iterator;
 
 /**
- * Interface Buffer
+ * Class Buffer
  */
-interface Buffer extends \Iterator
+class Buffer implements BufferInterface, \Countable
 {
     /**
-     * Peeks at the node from the end of the doubly linked list.
-     *
-     * @return mixed The value of the last node.
+     * @var \Traversable|\Generator|\Iterator
+     * @read-only
      */
-    public function top();
+    protected $iterator;
 
     /**
-     * Peeks at the node from the beginning of the doubly linked list.
-     *
-     * @return mixed The value of the first node.
+     * @var int
+     * @read-only
      */
-    public function bottom();
+    protected $size;
 
     /**
-     * Move backward to previous element.
-     *
-     * @return void Any returned value is ignored.
+     * @var \SplDoublyLinkedList
      */
-    public function previous(): void;
+    private $values;
+
+    /**
+     * Buffer constructor.
+     * @param \Traversable $iterator
+     * @param int $size
+     */
+    public function __construct(\Traversable $iterator, int $size = 10)
+    {
+        \assert($size > 0, 'Buffer size must be greater than 0');
+        \assert($size <= \PHP_INT_MAX, 'Buffer size must less than ' . \PHP_INT_MAX);
+
+        $this->size = $size;
+        $this->iterator = $iterator;
+
+        $this->values = new \SplDoublyLinkedList();
+
+        $this->next();
+    }
+
+    /**
+     * @return mixed
+     */
+    public function top()
+    {
+        return $this->values->top();
+    }
+
+    /**
+     * @return mixed
+     */
+    public function bottom()
+    {
+        return $this->values->bottom();
+    }
+
+    /**
+     * @return void
+     */
+    public function previous(): void
+    {
+        $this->values->prev();
+    }
+
+    /**
+     * @return mixed
+     */
+    public function current()
+    {
+        return $this->values->current();
+    }
+
+    /**
+     * @return void
+     */
+    public function next(): void
+    {
+        if ($this->iterator->valid()) {
+            $this->values->push($this->iterator->current());
+
+            $this->iterator->next();
+
+            if ($this->values->count() > $this->size) {
+                $this->values->shift();
+            }
+        }
+
+        $this->values->next();
+    }
+
+    /**
+     * @return mixed|int|string
+     */
+    public function key()
+    {
+        return $this->values->current();
+    }
+
+    /**
+     * @return bool
+     */
+    public function valid(): bool
+    {
+        return $this->values->valid();
+    }
+
+    /**
+     * @return void
+     */
+    public function rewind(): void
+    {
+        $this->values->rewind();
+    }
+
+    /**
+     * @return int
+     */
+    public function count(): int
+    {
+        return $this->values->count();
+    }
 }
