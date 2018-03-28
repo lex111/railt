@@ -411,7 +411,7 @@ abstract class Runtime implements ParserInterface
                     continue;
                 }
 
-                $rule = new AstRule((string)($id ?: $cId), \array_reverse($handle), $offset);
+                $rule       = new AstRule((string)($id ?: $cId), \array_reverse($handle), $offset);
                 $children[] = $rule;
             } elseif ($trace instanceof Escape) {
                 return $i + 1;
