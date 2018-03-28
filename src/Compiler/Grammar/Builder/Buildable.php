@@ -25,7 +25,7 @@ interface Buildable
      * @param int|string $to
      * @return Buildable
      */
-    public function move($to): Buildable;
+    public function move($to): self;
 
     /**
      * @return string

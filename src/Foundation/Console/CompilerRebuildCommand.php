@@ -9,7 +9,6 @@ declare(strict_types=1);
 
 namespace Railt\Foundation\Console;
 
-use Railt\Compiler\Generator\LexerGenerator;
 use Railt\Compiler\Generator\ParserGenerator;
 use Railt\Compiler\Grammar\ParsingResult;
 use Railt\Compiler\Grammar\Reader;

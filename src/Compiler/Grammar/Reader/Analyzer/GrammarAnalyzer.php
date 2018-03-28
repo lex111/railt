@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Railt\Compiler\Grammar\Reader\Analyzer;
 
+use Railt\Compiler\Grammar\Builder\AlternationBuilder;
 use Railt\Compiler\Grammar\Builder\Buildable;
 use Railt\Compiler\Grammar\Builder\ConcatenationBuilder;
 use Railt\Compiler\Grammar\Builder\Movable;
@@ -17,7 +18,6 @@ use Railt\Compiler\Grammar\Builder\TokenBuilder;
 use Railt\Compiler\Grammar\Lexer\Grammar as T;
 use Railt\Compiler\Iterator\LookaheadIterator;
 use Railt\Compiler\Lexer\Result\Eoi;
-use Railt\Compiler\Grammar\Builder\AlternationBuilder;
 use Railt\Compiler\TokenInterface;
 
 /**
