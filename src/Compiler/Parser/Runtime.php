@@ -10,7 +10,6 @@ declare(strict_types=1);
 namespace Railt\Compiler\Parser;
 
 use Railt\Compiler\Iterator\Buffer;
-use Railt\Compiler\Iterator\BufferedIterator;
 use Railt\Compiler\Iterator\BufferInterface;
 use Railt\Compiler\LexerInterface;
 use Railt\Compiler\Parser\Ast\Leaf;

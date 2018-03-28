@@ -41,7 +41,7 @@ class Buffer implements BufferInterface, \Countable
         \assert($size > 0, 'Buffer size must be greater than 0');
         \assert($size <= \PHP_INT_MAX, 'Buffer size must less than ' . \PHP_INT_MAX);
 
-        $this->size = $size;
+        $this->size     = $size;
         $this->iterator = $iterator;
 
         $this->values = new \SplDoublyLinkedList();
