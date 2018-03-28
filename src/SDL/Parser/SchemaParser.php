@@ -629,6 +629,6 @@ new \Railt\Compiler\Parser\Rule\Concatenation('Invocation', ['Directive',], null
      */
     public function getBuiltDate(): string
     {
-        return '2018-03-28MSK23:14:50.140+03:00';
+        return '2018-03-28MSK23:15:47.929+03:00';
     }
 }
