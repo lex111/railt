@@ -17,12 +17,12 @@ abstract class BaseSymbol implements Symbol
     /**
      * @var string|int
      */
-    private $id;
+    protected $id;
 
     /**
      * @var bool
      */
-    private $kept;
+    protected $kept;
 
     /**
      * BaseSymbol constructor.
@@ -33,6 +33,17 @@ abstract class BaseSymbol implements Symbol
     {
         $this->id = $id;
         $this->kept = $kept;
+    }
+
+    /**
+     * @param string|int $to
+     * @return BaseProduction
+     */
+    public function move($to): Symbol
+    {
+        $this->id = $to;
+
+        return $this;
     }
 
     /**

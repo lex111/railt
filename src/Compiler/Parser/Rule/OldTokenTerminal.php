@@ -55,7 +55,7 @@ class OldTokenTerminal extends OldRule
         parent::__construct($name, [], $nodeId);
 
         $this->tokenName   = $tokenName;
-        $this->setKept($kept);
+        $this->kept = $kept;
     }
 
     /**
@@ -127,13 +127,5 @@ class OldTokenTerminal extends OldRule
     public function isKept(): bool
     {
         return $this->kept;
-    }
-
-    /**
-     * @param $kept
-     */
-    public function setKept($kept): void
-    {
-        $this->kept = $kept;
     }
 }

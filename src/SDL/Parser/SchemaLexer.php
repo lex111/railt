@@ -79,6 +79,6 @@ final class SchemaLexer extends SchemaLexerRuntime
      */
     public function getBuiltDate(): string
     {
-        return '2018-03-28T20:40:04.472+03:00';
+        return '2018-03-28T21:58:15.635+03:00';
     }
 }

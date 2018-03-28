@@ -24,7 +24,7 @@ final class SchemaParser extends SchemaParserRuntime
     }
 
     /**
-     * @return \Railt\Compiler\Parser\Rule\OldRule[]
+     * @return \Railt\Compiler\Parser\Rule\Rule[]
      */
     public function getRules(): array
     {
@@ -306,6 +306,6 @@ final class SchemaParser extends SchemaParserRuntime
      */
     public function getBuiltDate(): string
     {
-        return '2018-03-28MSK20:40:04.513+03:00';
+        return '2018-03-28MSK21:58:15.687+03:00';
     }
 }

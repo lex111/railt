@@ -17,12 +17,12 @@ abstract class BaseProduction extends BaseSymbol implements Production
     /**
      * @var null|string
      */
-    private $name;
+    protected $name;
 
     /**
      * @var array|string[]|int[]
      */
-    private $children;
+    protected $children;
 
     /**
      * BaseProduction constructor.
@@ -52,5 +52,17 @@ abstract class BaseProduction extends BaseSymbol implements Production
     public function getName(): ?string
     {
         return $this->name;
+    }
+
+    /**
+     * @param string $name
+     * @return BaseProduction
+     */
+    public function rename(?string $name): Production
+    {
+        $this->kept = \is_string($name);
+        $this->name = $name;
+
+        return $this;
     }
 }

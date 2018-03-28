@@ -90,7 +90,7 @@ class GrammarAnalyzer extends BaseAnalyzer
 
             /** @var OldRule $zeRule */
             $zeRule = $this->parsedRules[$rule];
-            $zeRule->rename($key);
+            $zeRule->move($key);
 
             unset($this->parsedRules[$rule]);
             $this->parsedRules[$key] = $zeRule;
@@ -139,7 +139,7 @@ class GrammarAnalyzer extends BaseAnalyzer
         }
 
         if ($nNodeId !== null) {
-            $this->parsedRules[$rule]->setNodeId($nNodeId);
+            $this->parsedRules[$rule]->rename($nNodeId);
         }
 
         $children[] = $rule;
@@ -157,7 +157,7 @@ class GrammarAnalyzer extends BaseAnalyzer
             }
 
             if (null !== $nNodeId) {
-                $this->parsedRules[$rule]->setNodeId($nNodeId);
+                $this->parsedRules[$rule]->rename($nNodeId);
             }
 
             $children[] = $rule;

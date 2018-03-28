@@ -12,7 +12,7 @@ namespace Railt\Compiler\Parser\Rule;
 /**
  * Class Rule
  */
-abstract class OldRule implements Arrayable, Symbol
+abstract class OldRule implements Arrayable, Symbol, Production
 {
     /**
      * Rule name.
@@ -77,11 +77,21 @@ abstract class OldRule implements Arrayable, Symbol
         ];
     }
 
+    public function then(): array
+    {
+        return (array)$this->children;
+    }
+
+    public function getName(): ?string
+    {
+        return $this->nodeId;
+    }
+
     /**
      * @param string|int $name
      * @return OldRule
      */
-    public function rename($name): self
+    public function move($name): Symbol
     {
         $this->name = $name;
 
@@ -89,28 +99,13 @@ abstract class OldRule implements Arrayable, Symbol
     }
 
     /**
-     * @return array
+     * @param null|string $name
+     * @return Production
      */
-    public function getChildren()
+    public function rename(?string $name): Production
     {
-        return $this->children;
-    }
+        $this->nodeId = $name;
 
-    /**
-     * Get node ID.
-     *
-     * @return  string
-     */
-    public function getNodeId()
-    {
-        return $this->nodeId;
-    }
-
-    /**
-     * @param $nodeId
-     */
-    public function setNodeId($nodeId): void
-    {
-        $this->nodeId = $nodeId;
+        return $this;
     }
 }

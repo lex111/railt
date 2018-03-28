@@ -26,6 +26,7 @@ use Railt\Compiler\Parser\Trace\Invocation;
 use Railt\Compiler\Parser\Rule\OldRepetition;
 use Railt\Compiler\Parser\Rule\OldRule;
 use Railt\Compiler\Parser\Rule\OldTokenTerminal;
+use Railt\Compiler\Parser\Trace\Terminator;
 use Railt\Compiler\ParserInterface;
 use Railt\Compiler\TokenInterface;
 use Railt\Io\Readable;
@@ -209,12 +210,8 @@ abstract class Runtime implements ParserInterface
 
             $offset = $current->offset();
 
-            $leaf = clone $rule;
-            $leaf->setValue($value);
-            $leaf->setOffset($offset);
-
             \array_pop($this->todo);
-            $this->trace[] = $leaf;
+            $this->trace[] = new Terminator($rule->getTokenName(), $value, $offset, $rule->isKept());
             $buffer->next();
 
             return true;
@@ -222,7 +219,7 @@ abstract class Runtime implements ParserInterface
 
         if ($rule instanceof OldConcatenation) {
             $this->trace(new Entry($rule->getId(), 0, null, $this->depth), $buffer);
-            $children      = $rule->getChildren();
+            $children      = $rule->then();
 
             for ($i = \count($children) - 1; $i >= 0; --$i) {
                 $nextRule     = $children[$i];
@@ -234,7 +231,7 @@ abstract class Runtime implements ParserInterface
         }
 
         if ($rule instanceof OldChoice) {
-            $children = $rule->getChildren();
+            $children = $rule->then();
 
             if ($next >= \count($children)) {
                 return false;
@@ -250,7 +247,7 @@ abstract class Runtime implements ParserInterface
         }
 
         if ($rule instanceof OldRepetition) {
-            $nextRule = $rule->getChildren()[0];
+            $nextRule = $rule->then()[0];
 
             if ($next === 0) {
                 $name = $rule->getId();
@@ -323,7 +320,7 @@ abstract class Runtime implements ParserInterface
                 $found = $this->getRule($last->getRule()) instanceof OldChoice;
             } elseif ($last instanceof Escape) {
                 $found = $this->getRule($last->getRule()) instanceof OldRepetition;
-            } elseif ($last instanceof OldTokenTerminal) {
+            } elseif ($last instanceof Terminator) {
                 $buffer->previous();
 
                 if ($buffer->valid() === false) {
@@ -356,6 +353,7 @@ abstract class Runtime implements ParserInterface
         $max = \count($this->trace);
 
         while ($i < $max) {
+            /** @var Invocation|Terminator $trace */
             $trace = $this->trace[$i];
 
             if ($trace instanceof Entry) {
@@ -363,7 +361,7 @@ abstract class Runtime implements ParserInterface
                 $rule      = $this->rules[$ruleName];
                 $isRule    = $trace->isTransitional() === false;
                 $nextTrace = $this->trace[$i + 1];
-                $id        = $rule->getNodeId();
+                $id        = $rule->getName();
                 $offset    = $trace->getOffset();
 
                 // Optimization: Skip empty trace sequence.
@@ -423,7 +421,7 @@ abstract class Runtime implements ParserInterface
                     continue;
                 }
 
-                $children[] = new Leaf($trace->getTokenName(), $trace->getValue(), $trace->getOffset());
+                $children[] = new Leaf($trace->getName(), $trace->getValue(), $trace->getOffset());
                 ++$i;
             }
         }
