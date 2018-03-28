@@ -27,10 +27,4 @@ interface Symbol
      * @return bool
      */
     public function isKept(): bool;
-
-    /**
-     * @param string|int $to
-     * @return Symbol
-     */
-    public function move($to): Symbol;
 }

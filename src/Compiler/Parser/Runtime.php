@@ -18,14 +18,14 @@ use Railt\Compiler\Parser\Ast\NodeInterface;
 use Railt\Compiler\Parser\Ast\Rule as AstRule;
 use Railt\Compiler\Parser\Exceptions\ParserException;
 use Railt\Compiler\Parser\Exceptions\UnexpectedTokenException;
-use Railt\Compiler\Parser\Rule\OldChoice;
-use Railt\Compiler\Parser\Rule\OldConcatenation;
+use Railt\Compiler\Parser\Rule\Alternation;
+use Railt\Compiler\Parser\Rule\Concatenation;
+use Railt\Compiler\Parser\Rule\Repetition;
+use Railt\Compiler\Parser\Rule\Symbol;
+use Railt\Compiler\Parser\Rule\Token;
 use Railt\Compiler\Parser\Trace\Entry;
 use Railt\Compiler\Parser\Trace\Escape;
 use Railt\Compiler\Parser\Trace\Invocation;
-use Railt\Compiler\Parser\Rule\OldRepetition;
-use Railt\Compiler\Parser\Rule\OldRule;
-use Railt\Compiler\Parser\Rule\OldTokenTerminal;
 use Railt\Compiler\Parser\Trace\Terminator;
 use Railt\Compiler\ParserInterface;
 use Railt\Compiler\TokenInterface;
@@ -191,16 +191,16 @@ abstract class Runtime implements ParserInterface
     /**
      * Parse current rule
      * @param BufferedIterator $buffer
-     * @param OldRule $rule Current rule.
+     * @param Symbol $rule Current rule.
      * @param int $next Next rule index.
      * @return bool
      */
-    protected function parseCurrentRule(BufferedIterator $buffer, OldRule $rule, $next): bool
+    protected function parseCurrentRule(BufferedIterator $buffer, Symbol $rule, $next): bool
     {
-        if ($rule instanceof OldTokenTerminal) {
+        if ($rule instanceof Token) {
             $name = $buffer->current()->name();
 
-            if ($rule->getTokenName() !== $name) {
+            if ($rule->getName() !== $name) {
                 return false;
             }
 
@@ -211,13 +211,13 @@ abstract class Runtime implements ParserInterface
             $offset = $current->offset();
 
             \array_pop($this->todo);
-            $this->trace[] = new Terminator($rule->getTokenName(), $value, $offset, $rule->isKept());
+            $this->trace[] = new Terminator($rule->getName(), $value, $offset, $rule->isKept());
             $buffer->next();
 
             return true;
         }
 
-        if ($rule instanceof OldConcatenation) {
+        if ($rule instanceof Concatenation) {
             $this->trace(new Entry($rule->getId(), 0, null, $this->depth), $buffer);
             $children      = $rule->then();
 
@@ -230,7 +230,7 @@ abstract class Runtime implements ParserInterface
             return true;
         }
 
-        if ($rule instanceof OldChoice) {
+        if ($rule instanceof Alternation) {
             $children = $rule->then();
 
             if ($next >= \count($children)) {
@@ -246,12 +246,12 @@ abstract class Runtime implements ParserInterface
             return true;
         }
 
-        if ($rule instanceof OldRepetition) {
+        if ($rule instanceof Repetition) {
             $nextRule = $rule->then()[0];
 
             if ($next === 0) {
                 $name = $rule->getId();
-                $min  = $rule->getMin();
+                $min  = $rule->from();
 
                 $this->trace(new Entry($name, $min, null, $this->depth), $buffer);
                 \array_pop($this->todo);
@@ -266,9 +266,9 @@ abstract class Runtime implements ParserInterface
                 return true;
             }
 
-            $max = $rule->getMax();
+            $max = $rule->to();
 
-            if ($max !== OldRepetition::INF_MAX_VALUE && $next > $max) {
+            if ($max !== Repetition::INF_MAX_VALUE && $next > $max) {
                 return false;
             }
 
@@ -296,9 +296,9 @@ abstract class Runtime implements ParserInterface
      * Get rule by name.
      *
      * @param $name
-     * @return OldRule|null
+     * @return Symbol|null
      */
-    public function getRule($name): ?OldRule
+    public function getRule($name): ?Symbol
     {
         return $this->rules[$name] ?? null;
     }
@@ -317,9 +317,9 @@ abstract class Runtime implements ParserInterface
             $last = \array_pop($this->trace);
 
             if ($last instanceof Entry) {
-                $found = $this->getRule($last->getRule()) instanceof OldChoice;
+                $found = $this->getRule($last->getRule()) instanceof Alternation;
             } elseif ($last instanceof Escape) {
-                $found = $this->getRule($last->getRule()) instanceof OldRepetition;
+                $found = $this->getRule($last->getRule()) instanceof Repetition;
             } elseif ($last instanceof Terminator) {
                 $buffer->previous();
 

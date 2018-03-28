@@ -30,10 +30,4 @@ interface Production extends Symbol
      * @return null|string
      */
     public function getName(): ?string;
-
-    /**
-     * @param string|null $name
-     * @return Production
-     */
-    public function rename(?string $name): Production;
 }

@@ -19,12 +19,12 @@ class Repetition extends BaseProduction
     /**
      * @var int
      */
-    private $min;
+    protected $min;
 
     /**
      * @var int
      */
-    private $max;
+    protected $max;
 
     /**
      * Repetition constructor.
@@ -34,7 +34,7 @@ class Repetition extends BaseProduction
      * @param array $children
      * @param null|string $name
      */
-    public function __construct($id, int $min, int $max = self::INF_MAX_VALUE, $children = [], ?string $name = null)
+    public function __construct($id, int $min, int $max = self::INF_MAX_VALUE, array $children = [], ?string $name = null)
     {
         \assert($max === self::INF_MAX_VALUE || $max > $min,
             'Min repetition value must be less than max');

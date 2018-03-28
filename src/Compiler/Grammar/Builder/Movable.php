@@ -7,15 +7,21 @@
  */
 declare(strict_types=1);
 
-namespace Railt\Compiler\Parser\Rule;
+namespace Railt\Compiler\Grammar\Builder;
 
 /**
- * Interface Arrayable
+ * Trait Movable
  */
-interface Arrayable
+trait Movable
 {
     /**
-     * @return array
+     * @param string|int $to
+     * @return Buildable
      */
-    public function toArray(): array;
+    public function move($to): Buildable
+    {
+        $this->id = $to;
+
+        return $this;
+    }
 }

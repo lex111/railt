@@ -9,7 +9,8 @@ declare(strict_types=1);
 
 namespace Railt\Compiler\Generator;
 
-use Railt\Compiler\Parser;
+use Railt\Compiler\Grammar\ParsingResult;
+use Railt\Compiler\Lexer\Common\PCRECompiler;
 
 /**
  * Class ParserGenerator
@@ -22,24 +23,17 @@ class ParserGenerator extends BaseCodeGenerator
     protected $template = 'parser/llk.php.twig';
 
     /**
-     * @var Parser
+     * @var ParsingResult
      */
-    private $parser;
-
-    /**
-     * @var string
-     */
-    private $lexerClass;
+    private $result;
 
     /**
      * ParserGenerator constructor.
-     * @param Parser $parser
-     * @param string $lexer
+     * @param ParsingResult $result
      */
-    public function __construct(Parser $parser, string $lexer)
+    public function __construct(ParsingResult $result)
     {
-        $this->parser     = $parser;
-        $this->lexerClass = $lexer;
+        $this->result = $result;
     }
 
     /**
@@ -48,9 +42,16 @@ class ParserGenerator extends BaseCodeGenerator
      */
     protected function getContext(): \Generator
     {
+        $lexer = $this->result->getLexer();
+
         yield from parent::getContext();
 
-        yield 'lexer' => $this->lexerClass;
-        yield 'rules' => $this->parser->getRules();
+        $pcre = new PCRECompiler($lexer->getTokens());
+
+        yield 'pattern' => $pcre->compile();
+        yield 'tokens' => $lexer->getTokens();
+        yield 'skip' => $lexer->getIgnoredTokens();
+        yield 'lexer' => $this->result->getLexer();
+        yield 'rules' => $this->result->getBuilders();
     }
 }

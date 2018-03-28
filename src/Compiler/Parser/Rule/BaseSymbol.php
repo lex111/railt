@@ -36,17 +36,6 @@ abstract class BaseSymbol implements Symbol
     }
 
     /**
-     * @param string|int $to
-     * @return BaseProduction
-     */
-    public function move($to): Symbol
-    {
-        $this->id = $to;
-
-        return $this;
-    }
-
-    /**
      * @return int|string
      */
     public function getId()

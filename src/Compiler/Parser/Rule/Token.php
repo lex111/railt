@@ -17,7 +17,7 @@ class Token extends BaseSymbol implements Terminal
     /**
      * @var string
      */
-    private $name;
+    protected $name;
 
     /**
      * Token constructor.

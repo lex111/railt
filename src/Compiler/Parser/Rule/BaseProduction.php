@@ -53,16 +53,4 @@ abstract class BaseProduction extends BaseSymbol implements Production
     {
         return $this->name;
     }
-
-    /**
-     * @param string $name
-     * @return BaseProduction
-     */
-    public function rename(?string $name): Production
-    {
-        $this->kept = \is_string($name);
-        $this->name = $name;
-
-        return $this;
-    }
 }
