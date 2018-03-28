@@ -43,10 +43,10 @@ class Terminator
      */
     public function __construct(string $name, string $value, int $offset, bool $kept = true)
     {
-        $this->name = $name;
-        $this->value = $value;
+        $this->name   = $name;
+        $this->value  = $value;
         $this->offset = $offset;
-        $this->kept = $kept;
+        $this->kept   = $kept;
     }
 
     /**

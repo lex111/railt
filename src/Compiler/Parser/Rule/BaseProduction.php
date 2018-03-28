@@ -33,7 +33,7 @@ abstract class BaseProduction extends BaseSymbol implements Production
     public function __construct($id, array $children = [], string $name = null)
     {
         $this->children = $children;
-        $this->name = $name;
+        $this->name     = $name;
 
         parent::__construct($id, \is_string($name));
     }

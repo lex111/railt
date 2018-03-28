@@ -14,5 +14,4 @@ namespace Railt\Compiler\Parser\Rule;
  */
 class Alternation extends BaseProduction
 {
-
 }

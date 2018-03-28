@@ -31,7 +31,7 @@ abstract class BaseSymbol implements Symbol
      */
     public function __construct($id, bool $kept = false)
     {
-        $this->id = $id;
+        $this->id   = $id;
         $this->kept = $kept;
     }
 

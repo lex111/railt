@@ -9,7 +9,6 @@ declare(strict_types=1);
 
 namespace Railt\Compiler\Grammar\Builder;
 
-use Railt\Compiler\Parser\Rule\BaseProduction;
 use Railt\Compiler\Parser\Rule\Production;
 
 /**
