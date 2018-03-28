@@ -12,11 +12,11 @@ namespace Railt\Compiler\Grammar\Reader\Analyzer;
 use Railt\Compiler\Grammar\Lexer\Grammar as T;
 use Railt\Compiler\Iterator\LookaheadIterator;
 use Railt\Compiler\Lexer\Result\Eoi;
-use Railt\Compiler\Parser\Rule\Choice;
-use Railt\Compiler\Parser\Rule\Concatenation;
-use Railt\Compiler\Parser\Rule\Repetition;
-use Railt\Compiler\Parser\Rule\Rule;
-use Railt\Compiler\Parser\Rule\Terminal;
+use Railt\Compiler\Parser\Rule\OldChoice;
+use Railt\Compiler\Parser\Rule\OldConcatenation;
+use Railt\Compiler\Parser\Rule\OldRepetition;
+use Railt\Compiler\Parser\Rule\OldRule;
+use Railt\Compiler\Parser\Rule\OldTokenTerminal;
 use Railt\Compiler\TokenInterface;
 
 /**
@@ -88,9 +88,9 @@ class GrammarAnalyzer extends BaseAnalyzer
                 throw new \RuntimeException(\sprintf('Error while parsing rule %s.', $key), 1);
             }
 
-            /** @var Rule $zeRule */
+            /** @var OldRule $zeRule */
             $zeRule = $this->parsedRules[$rule];
-            $zeRule->setName($key);
+            $zeRule->rename($key);
 
             unset($this->parsedRules[$rule]);
             $this->parsedRules[$key] = $zeRule;
@@ -170,7 +170,7 @@ class GrammarAnalyzer extends BaseAnalyzer
         }
 
         $name                     = $this->transitionalRuleCounter++;
-        $this->parsedRules[$name] = new Choice($name, $children);
+        $this->parsedRules[$name] = new OldChoice($name, $children);
 
         return $name;
     }
@@ -206,7 +206,7 @@ class GrammarAnalyzer extends BaseAnalyzer
         }
 
         $name                     = $this->transitionalRuleCounter++;
-        $this->parsedRules[$name] = new Concatenation($name, $children);
+        $this->parsedRules[$name] = new OldConcatenation($name, $children);
 
         return $name;
     }
@@ -293,7 +293,7 @@ class GrammarAnalyzer extends BaseAnalyzer
         }
 
         $name                     = $this->transitionalRuleCounter++;
-        $this->parsedRules[$name] = new Repetition($name, $min, $max, $children, null);
+        $this->parsedRules[$name] = new OldRepetition($name, $min, $max, $children, null);
 
         return $name;
     }
@@ -348,7 +348,7 @@ class GrammarAnalyzer extends BaseAnalyzer
             $this->lookahead->getNext()->name() === TokenInterface::END_OF_INPUT
         ) {
             $name                     = $this->transitionalRuleCounter++;
-            $this->parsedRules[$name] = new Concatenation($name, [$tokenName]);
+            $this->parsedRules[$name] = new OldConcatenation($name, [$tokenName]);
         } else {
             $name = $tokenName;
         }
@@ -372,7 +372,7 @@ class GrammarAnalyzer extends BaseAnalyzer
         }
 
         $name                     = $this->transitionalRuleCounter++;
-        $this->parsedRules[$name] = new Terminal($name, $tokenName, null, $kept);
+        $this->parsedRules[$name] = new OldTokenTerminal($name, $tokenName, null, $kept);
         $this->lookahead->next();
 
         return $name;

@@ -10,8 +10,8 @@ declare(strict_types=1);
 namespace Railt\Compiler\Parser\Rule;
 
 /**
- * Class Ekzit
+ * Class Choice
  */
-class Escape extends Invocation
+class OldChoice extends OldRule
 {
 }

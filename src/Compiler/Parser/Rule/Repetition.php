@@ -12,82 +12,51 @@ namespace Railt\Compiler\Parser\Rule;
 /**
  * Class Repetition
  */
-class Repetition extends Rule
+class Repetition extends BaseProduction
 {
     public const INF_MAX_VALUE = -1;
 
     /**
-     * Minimum bound.
-     *
      * @var int
      */
-    protected $min = 0;
+    private $min;
 
     /**
-     * Maximum bound.
-     *
      * @var int
      */
-    protected $max = 0;
+    private $max;
 
     /**
-     * Constructor.
-     *
-     * @param string $name Name.
-     * @param int $min Minimum bound.
-     * @param int $max Maximum bound.
-     * @param mixed $children Children.
-     * @param string $nodeId Node ID.
+     * Repetition constructor.
+     * @param string|int $id
+     * @param int $min
+     * @param int $max
+     * @param array $children
+     * @param null|string $name
      */
-    public function __construct($name, $min, $max, $children, $nodeId)
+    public function __construct($id, int $min, int $max = self::INF_MAX_VALUE, $children = [], ?string $name = null)
     {
-        parent::__construct($name, $children, $nodeId);
-
-        $min = \max(0, (int) $min);
-        $max = \max(-1, (int) $max);
-
-        if (-1 !== $max && $min > $max) {
-            throw new \InvalidArgumentException(
-                'Cannot repeat with a min (%d) greater than max (%d).',
-                0,
-                [$min, $max]
-            );
-        }
+        \assert($max === self::INF_MAX_VALUE || $max > $min,
+            'Min repetition value must be less than max');
 
         $this->min = $min;
         $this->max = $max;
+
+        parent::__construct($id, $children, $name);
     }
 
     /**
-     * @return array
+     * @return int
      */
-    public function toArray(): array
-    {
-        return [
-            $this->name,
-            $this->min,
-            $this->max,
-            $this->children,
-            $this->nodeId,
-        ];
-    }
-
-    /**
-     * Get minimum bound.
-     *
-     * @return  int
-     */
-    public function getMin()
+    public function from(): int
     {
         return $this->min;
     }
 
     /**
-     * Get maximum bound.
-     *
-     * @return  int
+     * @return int
      */
-    public function getMax()
+    public function to(): int
     {
         return $this->max;
     }
@@ -95,10 +64,10 @@ class Repetition extends Rule
     /**
      * Check whether the maximum repetition is unbounded.
      *
-     * @return  bool
+     * @return bool
      */
-    public function isInfinite()
+    public function isInfinite(): bool
     {
-        return -1 === $this->getMax();
+        return $this->max === self::INF_MAX_VALUE;
     }
 }

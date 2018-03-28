@@ -7,11 +7,11 @@
  */
 declare(strict_types=1);
 
-namespace Railt\Compiler\Parser\Rule;
+namespace Railt\Compiler\Parser\Trace;
 
 /**
- * Class Choice
+ * Class Entry
  */
-class Choice extends Rule
+class Entry extends Invocation
 {
 }

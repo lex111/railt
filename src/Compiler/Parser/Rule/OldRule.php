@@ -12,7 +12,7 @@ namespace Railt\Compiler\Parser\Rule;
 /**
  * Class Rule
  */
-abstract class Rule implements Arrayable
+abstract class OldRule implements Arrayable, Symbol
 {
     /**
      * Rule name.
@@ -39,14 +39,30 @@ abstract class Rule implements Arrayable
      * Constructor.
      *
      * @param string $name Rule name.
-     * @param mixed $children Children.
+     * @param array $children Children.
      * @param string $nodeId Node ID.
      */
-    public function __construct($name, $children, $nodeId = null)
+    public function __construct($name, array $children, string $nodeId = null)
     {
         $this->name     = $name;
         $this->children = $children;
         $this->nodeId   = $nodeId;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isKept(): bool
+    {
+        return $this->nodeId !== null;
+    }
+
+    /**
+     * @return int|string
+     */
+    public function getId()
+    {
+        return $this->name;
     }
 
     /**
@@ -62,21 +78,14 @@ abstract class Rule implements Arrayable
     }
 
     /**
-     * Get rule name.
-     *
-     * @return  string
+     * @param string|int $name
+     * @return OldRule
      */
-    public function getName()
-    {
-        return $this->name;
-    }
-
-    /**
-     * @param $name
-     */
-    public function setName($name): void
+    public function rename($name): self
     {
         $this->name = $name;
+
+        return $this;
     }
 
     /**
@@ -85,11 +94,6 @@ abstract class Rule implements Arrayable
     public function getChildren()
     {
         return $this->children;
-    }
-
-    public function setChildrent($items): void
-    {
-        $this->children = $items;
     }
 
     /**

@@ -10,8 +10,9 @@ declare(strict_types=1);
 namespace Railt\Compiler\Parser\Rule;
 
 /**
- * Class Entry
+ * Class Alternation
  */
-class Entry extends Invocation
+class Alternation extends BaseProduction
 {
+
 }

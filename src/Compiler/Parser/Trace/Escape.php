@@ -7,12 +7,11 @@
  */
 declare(strict_types=1);
 
-namespace Railt\Compiler\Parser\Rule;
+namespace Railt\Compiler\Parser\Trace;
 
 /**
- * Class Concatenation
+ * Class Ekzit
  */
-class Concatenation extends BaseProduction
+class Escape extends Invocation
 {
-
 }

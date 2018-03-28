@@ -18,14 +18,14 @@ use Railt\Compiler\Parser\Ast\NodeInterface;
 use Railt\Compiler\Parser\Ast\Rule as AstRule;
 use Railt\Compiler\Parser\Exceptions\ParserException;
 use Railt\Compiler\Parser\Exceptions\UnexpectedTokenException;
-use Railt\Compiler\Parser\Rule\Choice;
-use Railt\Compiler\Parser\Rule\Concatenation;
-use Railt\Compiler\Parser\Rule\Entry;
-use Railt\Compiler\Parser\Rule\Escape;
-use Railt\Compiler\Parser\Rule\Invocation;
-use Railt\Compiler\Parser\Rule\Repetition;
-use Railt\Compiler\Parser\Rule\Rule;
-use Railt\Compiler\Parser\Rule\Terminal;
+use Railt\Compiler\Parser\Rule\OldChoice;
+use Railt\Compiler\Parser\Rule\OldConcatenation;
+use Railt\Compiler\Parser\Trace\Entry;
+use Railt\Compiler\Parser\Trace\Escape;
+use Railt\Compiler\Parser\Trace\Invocation;
+use Railt\Compiler\Parser\Rule\OldRepetition;
+use Railt\Compiler\Parser\Rule\OldRule;
+use Railt\Compiler\Parser\Rule\OldTokenTerminal;
 use Railt\Compiler\ParserInterface;
 use Railt\Compiler\TokenInterface;
 use Railt\Io\Readable;
@@ -190,13 +190,13 @@ abstract class Runtime implements ParserInterface
     /**
      * Parse current rule
      * @param BufferedIterator $buffer
-     * @param Rule $rule Current rule.
+     * @param OldRule $rule Current rule.
      * @param int $next Next rule index.
      * @return bool
      */
-    protected function parseCurrentRule(BufferedIterator $buffer, Rule $rule, $next): bool
+    protected function parseCurrentRule(BufferedIterator $buffer, OldRule $rule, $next): bool
     {
-        if ($rule instanceof Terminal) {
+        if ($rule instanceof OldTokenTerminal) {
             $name = $buffer->current()->name();
 
             if ($rule->getTokenName() !== $name) {
@@ -220,8 +220,8 @@ abstract class Runtime implements ParserInterface
             return true;
         }
 
-        if ($rule instanceof Concatenation) {
-            $this->trace(new Entry($rule->getName(), 0, null, $this->depth), $buffer);
+        if ($rule instanceof OldConcatenation) {
+            $this->trace(new Entry($rule->getId(), 0, null, $this->depth), $buffer);
             $children      = $rule->getChildren();
 
             for ($i = \count($children) - 1; $i >= 0; --$i) {
@@ -233,14 +233,15 @@ abstract class Runtime implements ParserInterface
             return true;
         }
 
-        if ($rule instanceof Choice) {
+        if ($rule instanceof OldChoice) {
             $children = $rule->getChildren();
 
             if ($next >= \count($children)) {
                 return false;
             }
 
-            $this->trace(new Entry($rule->getName(), $next, $this->todo, $this->depth), $buffer);
+            $this->trace(new Entry($rule->getId(), $next, $this->todo, $this->depth), $buffer);
+            /** @var string|int $nextRule */
             $nextRule      = $children[$next];
             $this->todo[]  = new Escape($nextRule, 0);
             $this->todo[]  = new Entry($nextRule, 0);
@@ -248,11 +249,11 @@ abstract class Runtime implements ParserInterface
             return true;
         }
 
-        if ($rule instanceof Repetition) {
-            $nextRule = $rule->getChildren();
+        if ($rule instanceof OldRepetition) {
+            $nextRule = $rule->getChildren()[0];
 
             if ($next === 0) {
-                $name = $rule->getName();
+                $name = $rule->getId();
                 $min  = $rule->getMin();
 
                 $this->trace(new Entry($name, $min, null, $this->depth), $buffer);
@@ -270,11 +271,11 @@ abstract class Runtime implements ParserInterface
 
             $max = $rule->getMax();
 
-            if ($max !== Repetition::INF_MAX_VALUE && $next > $max) {
+            if ($max !== OldRepetition::INF_MAX_VALUE && $next > $max) {
                 return false;
             }
 
-            $this->todo[] = new Escape($rule->getName(), $next, $this->todo);
+            $this->todo[] = new Escape($rule->getId(), $next, $this->todo);
             $this->todo[] = new Escape($nextRule, 0);
             $this->todo[] = new Entry($nextRule, 0);
 
@@ -298,9 +299,9 @@ abstract class Runtime implements ParserInterface
      * Get rule by name.
      *
      * @param $name
-     * @return Rule|null
+     * @return OldRule|null
      */
-    public function getRule($name): ?Rule
+    public function getRule($name): ?OldRule
     {
         return $this->rules[$name] ?? null;
     }
@@ -319,10 +320,10 @@ abstract class Runtime implements ParserInterface
             $last = \array_pop($this->trace);
 
             if ($last instanceof Entry) {
-                $found = $this->getRule($last->getRule()) instanceof Choice;
+                $found = $this->getRule($last->getRule()) instanceof OldChoice;
             } elseif ($last instanceof Escape) {
-                $found = $this->getRule($last->getRule()) instanceof Repetition;
-            } elseif ($last instanceof Terminal) {
+                $found = $this->getRule($last->getRule()) instanceof OldRepetition;
+            } elseif ($last instanceof OldTokenTerminal) {
                 $buffer->previous();
 
                 if ($buffer->valid() === false) {
