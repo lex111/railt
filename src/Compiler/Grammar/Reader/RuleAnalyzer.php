@@ -29,7 +29,7 @@ class RuleAnalyzer implements Analyzer
      */
     private const ANALYSERS = [
         GrammarAnalyzer::class,
-        TerminalsSimplifier::class
+        TerminalsSimplifier::class,
     ];
 
     /**
