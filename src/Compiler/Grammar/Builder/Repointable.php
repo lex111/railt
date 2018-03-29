@@ -10,19 +10,17 @@ declare(strict_types=1);
 namespace Railt\Compiler\Grammar\Builder;
 
 /**
- * Trait Movable
+ * Trait Repointable
  */
-trait Movable
+trait Repointable
 {
     /**
-     * @param string|int $to
-     * @return Buildable
+     * @param array $newPointers
+     * @return self
      */
-    public function move($to): Buildable
+    public function repoint(array $newPointers): self
     {
-        \assert(\is_string($to) || \is_int($to));
-
-        $this->id = $to;
+        $this->children = $newPointers;
 
         return $this;
     }

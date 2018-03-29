@@ -69,7 +69,7 @@ class ParsingResult
     public function getParser(): ParserInterface
     {
         if ($this->parser === null) {
-            $this->parser = new Parser($this->getLexer(), $this->getBuilders());
+            $this->parser = new Parser($this->getLexer(), $this->getRules());
         }
 
         return $this->parser;

@@ -18,6 +18,7 @@ class RepetitionBuilder extends Repetition implements Buildable
 {
     use Movable;
     use Renameable;
+    use Repointable;
     use Instantiable;
 
     /**

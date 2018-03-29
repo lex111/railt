@@ -18,6 +18,7 @@ class AlternationBuilder extends Alternation implements Buildable
 {
     use Movable;
     use Renameable;
+    use Repointable;
     use Instantiable;
 
     /**

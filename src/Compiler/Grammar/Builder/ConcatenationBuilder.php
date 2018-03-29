@@ -18,6 +18,7 @@ class ConcatenationBuilder extends Concatenation implements Buildable
 {
     use Movable;
     use Renameable;
+    use Repointable;
     use Instantiable;
 
     /**
